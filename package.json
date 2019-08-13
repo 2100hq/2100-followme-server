@@ -1,0 +1,37 @@
+{
+  "name": "2100-followme-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:2100hq/2100-followme-server.git",
+  "author": "david <david@citizenhex.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "node start"
+  },
+  "dependencies": {
+    "bignumber": "^1.1.0",
+    "bignumber.js": "^9.0.0",
+    "bluebird": "^3.5.5",
+    "body-parser": "^1.19.0",
+    "cookie-parser": "^1.4.4",
+    "cors": "^2.8.5",
+    "dotenv": "^8.0.0",
+    "ethers": "^4.0.33",
+    "express": "^4.17.1",
+    "express-bearer-token": "^2.4.0",
+    "fastest-validator": "^0.6.17",
+    "highland": "^2.13.5",
+    "lodash": "^4.17.15",
+    "moment": "^2.24.0",
+    "pad": "^3.2.0",
+    "rethink-table": "^0.0.5",
+    "rethinkdb": "^2.3.3",
+    "socket.io": "^2.2.0",
+    "socket.io-client": "^2.2.0",
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "axios": "^0.19.0",
+    "tape": "^4.11.0"
+  }
+}
