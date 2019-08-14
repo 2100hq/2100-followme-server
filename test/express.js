@@ -37,8 +37,9 @@ const Actions = host => (channel,method='post') => {
 
 
 test('express',t=>{
-  let actions 
+  let actions, mytoken
   const userid = publicAddress
+
   t.test('init',t=>{
     actions = {
       public:Actions(host)('public'),
@@ -57,7 +58,22 @@ test('express',t=>{
     t.end()
   })
   t.test('myTokens',async t=>{
-    const result = await actions.private.call('myTokens')
+    [mytoken] = await actions.private.call('myTokens')
+    t.ok(mytoken)
+    t.end()
+  })
+  t.test('sendMessage',async t=>{
+    const result = await actions.private.call('sendMessage',mytoken.id,'test')
+    console.log('result',result)
+    t.end()
+  })
+  t.test('getMyInbox',async t=>{
+    const result = await actions.private.call('getMyInbox')
+    console.log('result',result)
+    t.end()
+  })
+  t.test('getUserFeed',async t=>{
+    const result = await actions.private.call('getUserFeed',mytoken.id)
     console.log('result',result)
     t.end()
   })

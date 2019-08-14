@@ -39,7 +39,7 @@ module.exports = async (config, {actions,users,authenticate}) => {
   })
 
   app.use(function(err, req, res, next) {
-    // console.log('errror',err)
+    console.log(err)
     res.status(500).send(err.message || err)
   })
 

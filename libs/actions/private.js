@@ -17,8 +17,7 @@ module.exports = (config,{x2100,users,messages,threads})=>{
       myTokens(){
         return x2100.public.call('ownedTokens',user.id)
       },
-      async createMessage(tokenid,message,threshold=config.defaultThreshold){
-
+      async sendMessage(tokenid,message,threshold=config.defaultThreshold){
         assert(await x2100.public.call('isOwner',user.id,tokenid),'You are not the token owner')
 
         threshold = ethToWei(threshold)
@@ -31,29 +30,30 @@ module.exports = (config,{x2100,users,messages,threads})=>{
           threshold,
         })
 
-        //add message to users own inbox
-        await threads.create({threadid:user.id,messageid:messageid})
+        //add message to your own inbox
+        await threads.create({threadid:user.id,messageid:message.id})
 
         //add messages to followers inboxes
-        const qualified = lodash(followers).filter((amount,userid)=>{
+        const qualified = lodash(followers).entries().filter(([amount,userid])=>{
           return bn(amount).isGreaterThanOrEqualTo(threshold)
-        }).map((amount,userid)=>{
+        }).map(([amount,userid])=>{
           return threads.create({threadid:userid,messageid:message.id})
-        })
+        }).value()
 
         await Promise.all(qualified)
 
         return message
       },
       async getMyInbox(start=0,end=Date.now()){
-        const list = threads.between(user.id,start,end)
+        const list = await threads.between(user.id,start,end)
         return Promise.map(list,thread=>{
           return messages.get(thread.messageid)
         })
       },
       async getUserFeed(tokenid,start,end){
         const myHolding = await x2100.public.call('userHolding',user.id,tokenid)
-        const list = threads.between(tokenid,start,end)
+        const ownerAddress = await x2100.public.call('getTokenOwner',tokenid)
+        const list = await threads.between(ownerAddress,start,end)
 
         return Promise.reduce(list,async (result,thread)=>{
           const message = await messages.get(thread.messageid)

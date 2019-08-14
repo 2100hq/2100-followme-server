@@ -15,6 +15,7 @@ module.exports = (config,table,emit=x=>x) => {
   }
 
   async function set(props) {
+    console.log(props)
     props = validate(defaults(props))
     await table.set(props.id,props)
     emit('change',props)

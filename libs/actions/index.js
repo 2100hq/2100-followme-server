@@ -3,8 +3,8 @@ const lodash = require('lodash')
 module.exports = (name, config, libs)=>{
   const actions = require('./' + name)(config,libs)
   assert(actions,'actions not found: ' + name)
-  return async (user,action,...args)=>{
-    console.log(user,action,...args)
+  return async (user,action,args)=>{
+    // console.log(user,action,...args)
     const id = lodash.uniqueId([name,action].join(' '))
     console.time(id)
     const scope = actions(user)
