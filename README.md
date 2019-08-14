@@ -3,11 +3,14 @@ Backend for experimental chat app using the 2100 api. This attempts to make a pe
 based communication app that only shows messages to people who own your 2100 tokens. 
 
 ## ENV
+
+```
 service=followme
 express.port=5498
 rethink.db=followme
 2100.host=ws://socket.staging.2100.co
 defaultThreshold=.01
+```
 
 ## API
 ### Authentication
