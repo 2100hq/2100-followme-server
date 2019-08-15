@@ -65,6 +65,7 @@ module.exports = (config,{x2100,users,messages,threads})=>{
               userid:message.userid,
               created:message.created,
               length:message.length,
+              threshold:message.threshold,
               hidden:true,
             })
           }
