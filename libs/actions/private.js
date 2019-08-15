@@ -59,6 +59,14 @@ module.exports = (config,{x2100,users,messages,threads})=>{
           const message = await messages.get(thread.messageid)
           if(bn(myHolding).isGreaterThanOrEqualTo(message.threshold)){
             result.push(message)
+          }else{
+            result.push({
+              id:message.id,
+              userid:message.userid,
+              created:message.created,
+              length:message.length,
+              hidden:true,
+            })
           }
           return result
         },[])
