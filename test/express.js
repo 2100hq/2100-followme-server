@@ -77,6 +77,18 @@ test('express',t=>{
     console.log('result',result)
     t.end()
   })
+  t.test('followers',async t=>{
+    const result = await actions.private.call('followers',mytoken.id,0.1)
+    console.log('result',result)
+    t.end()
+  })
+  t.test('setDefaultThreshold',async t=>{
+    const result = await actions.private.call('setDefaultThreshold',.02)
+    console.log('result',result)
+    t.end()
+  })
+
+
 })
 
 

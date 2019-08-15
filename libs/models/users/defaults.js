@@ -1,9 +1,9 @@
 const uuid = require('uuid/v4')
-module.exports = () => {
+module.exports = (config) => {
   return (props = {}) => {
     return {
       id: uuid(),
-      favorites:[],
+      defaultThreshold:config.defaultThreshold,
       ...props,
     }
   }

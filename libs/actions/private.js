@@ -10,6 +10,7 @@ module.exports = (config,{x2100,users,messages,threads})=>{
   assert(threads,'requires threads')
   return user=>{
     assert(user,'you must login')
+    const defaultThreshold = user.defaultThreshold || config.defaultThreshold || 0
     return {
       me(){
         return user
@@ -17,7 +18,20 @@ module.exports = (config,{x2100,users,messages,threads})=>{
       myTokens(){
         return x2100.public.call('ownedTokens',user.id)
       },
-      async sendMessage(tokenid,message,threshold=config.defaultThreshold){
+      setDefaultThreshold(threshold){
+        return users.setDefaultThreshold(user.id,threshold)
+      },
+      async followers(tokenid,threshold=defaultThreshold){
+        threshold = ethToWei(threshold)
+        assert(await x2100.public.call('isOwner',user.id,tokenid),'You are not the token owner')
+        const followers = await x2100.public.call('tokenHolders',tokenid)
+        return lodash(followers).entries().filter(([userid,amount])=>{
+          return bn(amount).isGreaterThanOrEqualTo(threshold)
+        }).map(([userid,amount])=>{
+          return userid
+        }).value()
+      },
+      async sendMessage(tokenid,message,threshold=defaultThreshold){
         assert(await x2100.public.call('isOwner',user.id,tokenid),'You are not the token owner')
 
         threshold = ethToWei(threshold)
@@ -34,9 +48,9 @@ module.exports = (config,{x2100,users,messages,threads})=>{
         await threads.create({threadid:user.id,messageid:message.id})
 
         //add messages to followers inboxes
-        const qualified = lodash(followers).entries().filter(([amount,userid])=>{
+        const qualified = lodash(followers).entries().filter(([userid,amount])=>{
           return bn(amount).isGreaterThanOrEqualTo(threshold)
-        }).map(([amount,userid])=>{
+        }).map(([userid,amount])=>{
           return threads.create({threadid:userid,messageid:message.id})
         }).value()
 

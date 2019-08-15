@@ -77,6 +77,14 @@ must be less than the end date. If not supplied start=0 and end=Date.now()
 Get all messages posted by a 2100 owner on their token. This will only return 
 messages you are authorized to view.
 
+#### POST private/followers(tokenid:string,threshold:number) => userids[]
+See a list of users who own more than threshold of your token. You must own the token.
+
+#### POST private/setDefaultThreshold(threshold:number) => user
+Set your default message threshold visibility when sending a message to your followers.
+This can also be overridden by explicitly setting it when calling `private/sendMessage`.
+
+
 
 
 
