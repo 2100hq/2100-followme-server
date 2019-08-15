@@ -4,5 +4,6 @@ module.exports = config => {
     created:'number',
     message:'string',
     userid:'string',
+    tokenid:'string',
   }
 }

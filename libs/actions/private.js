@@ -45,8 +45,8 @@ module.exports = (config,{x2100,users,messages,threads})=>{
           threshold,
         })
 
-        //add message to your own inbox
-        await threads.create({threadid:user.id,messageid:message.id})
+        //add message to tokens feed
+        await threads.create({threadid:tokenid,messageid:message.id})
 
         //add messages to followers inboxes
         const qualified = lodash(followers).entries().filter(([userid,amount])=>{
@@ -68,25 +68,22 @@ module.exports = (config,{x2100,users,messages,threads})=>{
       async getUserFeed(tokenid,start,end){
         const myHolding = await x2100.public.call('userHolding',user.id,tokenid)
         const ownerAddress = await x2100.public.call('getTokenOwner',tokenid)
-        const list = await threads.between(ownerAddress,start,end)
+        const list = await threads.between(tokenid,start,end)
 
-        return Promise.reduce(list,async (result,thread)=>{
+        return Promise.map(list,async thread=>{
           const message = await messages.get(thread.messageid)
-          if(bn(myHolding).isGreaterThanOrEqualTo(message.threshold)){
-            result.push(message)
-          }else{
-            result.push({
-              id:message.id,
-              userid:message.userid,
-              created:message.created,
-              length:message.length,
-              threshold:message.threshold,
-              tokenid:message.tokenid,
-              hidden:true,
-            })
+          if(ownerAddress.toLowerCase() === user.id.toLowerCase())  return message
+          if(bn(myHolding).isGreaterThanOrEqualTo(message.threshold)) return message
+          return {
+            id:message.id,
+            userid:message.userid,
+            created:message.created,
+            length:message.length,
+            threshold:message.threshold,
+            tokenid:message.tokenid,
+            hidden:true,
           }
-          return result
-        },[])
+        })
       }
     }
   }
