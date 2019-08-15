@@ -41,6 +41,7 @@ module.exports = (config,{x2100,users,messages,threads})=>{
         message =  await messages.create({
           message,
           userid:user.id,
+          tokenid:tokenid,
           threshold,
         })
 
@@ -80,6 +81,7 @@ module.exports = (config,{x2100,users,messages,threads})=>{
               created:message.created,
               length:message.length,
               threshold:message.threshold,
+              tokenid:message.tokenid,
               hidden:true,
             })
           }
