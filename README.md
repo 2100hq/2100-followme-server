@@ -73,7 +73,7 @@ do not provide a threshold.
 Retrieve all messages either you sent, or you have subscribed to between dates. The start date
 must be less than the end date. If not supplied start=0 and end=Date.now()
 
-#### POST private/getUserFeed(tokenid:string,start:Date,end:Date) => message[]
+#### POST private/getTokenFeed(tokenid:string,start:Date,end:Date) => message[]
 Get all messages posted by a 2100 owner on their token. This will only return 
 messages you are authorized to view.
 

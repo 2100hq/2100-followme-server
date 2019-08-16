@@ -6,7 +6,7 @@ const host = `http://localhost:${config.express.port}`
 const {publicAddress} = config.test
 
 const Actions = host => (channel,method='post') => {
-  let token 
+  let token
   const call = async (action,...args) => {
     const options = {
       method,
@@ -73,8 +73,8 @@ test('express',t=>{
     console.log('result',result)
     t.end()
   })
-  t.test('getUserFeed',async t=>{
-    const result = await actions.private.call('getUserFeed',mytoken.id)
+  t.test('getTokenFeed',async t=>{
+    const result = await actions.private.call('getTokenFeed',mytoken.id)
     console.log('result',result)
     t.end()
   })

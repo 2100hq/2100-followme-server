@@ -37,7 +37,7 @@ module.exports = (config,{x2100,users,messages,threads})=>{
         threshold = ethToWei(threshold)
 
         const followers = await x2100.public.call('tokenHolders',tokenid)
-        
+
         message =  await messages.create({
           message,
           userid:user.id,
@@ -65,7 +65,7 @@ module.exports = (config,{x2100,users,messages,threads})=>{
           return messages.get(thread.messageid)
         })
       },
-      async getUserFeed(tokenid,start,end){
+      async getTokenFeed(tokenid,start,end){
         const myHolding = await x2100.public.call('userHolding',user.id,tokenid)
         const ownerAddress = await x2100.public.call('getTokenOwner',tokenid)
         const list = await threads.between(tokenid,start,end)
