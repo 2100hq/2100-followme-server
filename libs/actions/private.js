@@ -37,29 +37,27 @@ module.exports = (config,{x2100,users,messages,threads})=>{
       async sendMessage(tokenid,message,threshold=defaultThreshold){
         assert(await x2100.public.call('isOwner',user.id,tokenid),'You are not the token owner')
 
-        message =  await messages.create({
+        message = await messages.create({
           message,
           userid:user.id,
           tokenid:tokenid,
           threshold: ethToWei(threshold),
         })
 
-        // get followers; this excludes the owner
-        const qualified = await actions.followers(tokenid, threshold)
+        // get follower ids; this excludes the owner
+        const recipientIds = Object.keys(await actions.followers(tokenid, threshold))
 
-        //add message to owners feed
-        await threads.create({threadid:user.id,messageid:message.id})
+        //add owner to recipients
+        recipientIds.unshift(user.id)
+        //add token feed to recipients
+        recipientIds.unshift(tokenid)
+        //add anonymized public feed to recipients
+        recipientIds.unshift(publicFeedId)
 
-        //add message to tokens feed
-        await threads.create({threadid:tokenid,messageid:message.id})
-
-        //add anonymized message to public feed
-        await threads.create({threadid:publicFeedId,messageid:message.id})
-
-        //add messages to followers inboxes
-        const sent = lodash(qualified).map(([userid,amount])=>{
-          return threads.create({threadid:userid,messageid:message.id})
-        }).value()
+        //add messages to recipient inboxes
+        const sent = recipientIds.map(threadid=>{
+          return threads.create({threadid,messageid:message.id})
+        })
 
         await Promise.all(sent)
 
