@@ -49,10 +49,13 @@ Parameters are sent attached to the data attribute for POST.
 ```
 
 ### Public API
-There is currently no public routes but a utility for testing connectivity.
+Unauthenticated routes.
 
 #### POST public/echo(x:any) => x
 This will just echo back what you pass in
+
+#### POST public/feed(start:int,end:int) => messages[]
+Returns blank messages representing messaging activity. 
 
 ### Private API
 This is the bulk of the api, all private calls require a authentication token.

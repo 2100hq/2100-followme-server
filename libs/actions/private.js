@@ -8,6 +8,8 @@ module.exports = (config,{x2100,users,messages,threads})=>{
   assert(x2100,'requires 2100 client')
   assert(messages,'requires messages')
   assert(threads,'requires threads')
+  const {publicFeedId} = config
+  assert(publicFeedId,'requires public feed id')
   return user=>{
     assert(user,'you must login')
     const defaultThreshold = user.defaultThreshold || config.defaultThreshold || 0
@@ -49,6 +51,9 @@ module.exports = (config,{x2100,users,messages,threads})=>{
         //add message to tokens feed
         await threads.create({threadid:tokenid,messageid:message.id})
 
+        //add anonymized message to public feed
+        await threads.create({threadid:publicFeedId,messageid:message.id})
+
         //add messages to followers inboxes
         const qualified = lodash(followers).entries().filter(([userid,amount])=>{
           return bn(amount).isGreaterThanOrEqualTo(threshold)
@@ -66,6 +71,20 @@ module.exports = (config,{x2100,users,messages,threads})=>{
           return messages.get(thread.messageid)
         })
       },
+      async getMessage(messageid){
+        const message = await messages.get(messageid)
+        const myHolding = await x2100.public.call('userHolding',user.id,message.tokenid)
+        if(bn(myHolding).isGreaterThanOrEqualTo(message.threshold)) return message
+        return {
+          id:message.id,
+          userid:message.userid,
+          created:message.created,
+          length:message.message.length,
+          threshold:message.threshold,
+          tokenid:message.tokenid,
+          hidden:true,
+        }
+      },
       async getTokenFeed(tokenid,start,end){
         const myHolding = await x2100.public.call('userHolding',user.id,tokenid)
         const ownerAddress = await x2100.public.call('getTokenOwner',tokenid)
@@ -79,7 +98,7 @@ module.exports = (config,{x2100,users,messages,threads})=>{
             id:message.id,
             userid:message.userid,
             created:message.created,
-            length:message.length,
+            length:message.message.length,
             threshold:message.threshold,
             tokenid:message.tokenid,
             hidden:true,

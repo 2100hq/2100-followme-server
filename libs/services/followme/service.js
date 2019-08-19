@@ -6,9 +6,13 @@ const Actions = require('../../actions')
 const x2100 = require('../../2100')
 
 module.exports = async (config)=>{
+  config.publicFeedId = config.publicFeedId || '0x0'
+  config.defaultThreshold = config.defaultThreshold || 0
+
   const con = await RethinkConnection(config.rethink)
   const events = new Events()
   const libs = await InitRethink(config,{con},(...args)=>events.emit('models',args))
+
 
   libs.x2100 ={
     public:await x2100(config[2100].host,'public'),

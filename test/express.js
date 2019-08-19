@@ -37,7 +37,7 @@ const Actions = host => (channel,method='post') => {
 
 
 test('express',t=>{
-  let actions, mytoken
+  let actions, mytoken, messages
   const userid = publicAddress
 
   t.test('init',t=>{
@@ -50,6 +50,11 @@ test('express',t=>{
   })
   t.test('echo',async t=>{
     const result = await actions.public.call('echo','test').catch(t.end)
+    t.end()
+  })
+  t.test('public.feed',async t=>{
+    const result = await actions.public.call('feed').catch(t.end)
+    console.log(result)
     t.end()
   })
   t.test('me',async t=>{
@@ -74,8 +79,8 @@ test('express',t=>{
     t.end()
   })
   t.test('getTokenFeed',async t=>{
-    const result = await actions.private.call('getTokenFeed',mytoken.id)
-    console.log('result',result)
+    messages = await actions.private.call('getTokenFeed',mytoken.id)
+    console.log('result',messages)
     t.end()
   })
   t.test('followers',async t=>{
@@ -85,6 +90,11 @@ test('express',t=>{
   })
   t.test('setDefaultThreshold',async t=>{
     const result = await actions.private.call('setDefaultThreshold',.02)
+    console.log('result',result)
+    t.end()
+  })
+  t.test('getMessage',async t=>{
+    const result = await actions.private.call('getMessage',messages[0].id)
     console.log('result',result)
     t.end()
   })

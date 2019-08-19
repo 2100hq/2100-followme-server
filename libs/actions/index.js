@@ -5,7 +5,7 @@ module.exports = (name, config, libs)=>{
   assert(actions,'actions not found: ' + name)
   return async (user,action,args)=>{
     // console.log(user,action,...args)
-    const id = lodash.uniqueId([name,action].join(' '))
+    const id = lodash.uniqueId([name,action,''].join(' '))
     console.time(id)
     const scope = actions(user)
     assert(scope[action],'No such action ' + action + ' in ' + name)
