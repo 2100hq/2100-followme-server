@@ -12,8 +12,9 @@ module.exports = (config,{threads,messages}) => {
       },
       async feed(start,end){
         const list = await threads.between(publicFeedId,start,end)
-        return Promise.map(list,async thread=>{
-          const message = await messages.get(thread.messageid)
+        const ms = await messages.getAll(list.map(x=>x.messageid))
+
+        return ms.map(message=>{
           return {
             id:message.id,
             userid:message.userid,
