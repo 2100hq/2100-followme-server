@@ -27,12 +27,15 @@ module.exports = (config,{x2100,users,messages,threads})=>{
         threshold = ethToWei(threshold)
         assert(await x2100.public.call('isOwner',user.id,tokenid),'You are not the token owner')
         const followers = await x2100.public.call('tokenHolders',tokenid)
-        return lodash(followers).entries().filter(([userid,amount])=>{
+
+        return Object.entries(followers).filter(([userid,amount])=>{
           if (userid.toLowerCase() === user.id.toLowerCase()) return false // exclude the owner from the list of followers
           return bn(amount).isGreaterThanOrEqualTo(threshold)
-        }).map(([userid,amount])=>{
-          return userid
-        }).value()
+        }).reduce((obj, [userid,amount])=>{
+          obj[userid] = amount
+          return obj
+        }, {})
+
       },
       async sendMessage(tokenid,message,threshold=defaultThreshold){
         assert(await x2100.public.call('isOwner',user.id,tokenid),'You are not the token owner')
