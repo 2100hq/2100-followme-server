@@ -7,6 +7,7 @@ module.exports = (config, {users,authenticate}) => {
   const router = Express.Router()
 
   router.use((req,res,next)=>{
+    if(req.token == null) return next()
     authenticate(req.token).then(userid=>{
       return users.getOrCreate(userid)
     }).then(user=>{

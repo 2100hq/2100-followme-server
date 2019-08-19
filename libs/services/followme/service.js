@@ -30,9 +30,10 @@ module.exports = async (config)=>{
   }
 
   libs.authenticate = async function(tokenid){
+    console.log('tokenid',tokenid)
     if(config.disableAuth){
       //this should be userid if auth is disabled
-      return tokenid
+      return tokenid.toLowerCase()
     }else{
       //this returns 2100 userid
       return libs.x2100.auth.call('user',tokenid)

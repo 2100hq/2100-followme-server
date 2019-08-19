@@ -45,7 +45,8 @@ test('express',t=>{
       public:Actions(host)('public'),
       private:Actions(host)('private'),
     }
-    actions.private.setToken(config.test.tokenid)
+    // actions.private.setToken(config.test.tokenid)
+    actions.private.setToken(config.test.publicAddress)
     t.end()
   })
   t.test('echo',async t=>{
@@ -64,40 +65,41 @@ test('express',t=>{
   })
   t.test('myTokens',async t=>{
     const result = await actions.private.call('myTokens')
+    console.log(result)
     t.ok(result.length)
     mytoken = result[0]
     t.end()
   })
-  t.test('sendMessage',async t=>{
-    const result = await actions.private.call('sendMessage',mytoken.id,'test')
-    console.log('result',result)
-    t.end()
-  })
-  t.test('getMyInbox',async t=>{
-    const result = await actions.private.call('getMyInbox')
-    console.log('result',result)
-    t.end()
-  })
-  t.test('getTokenFeed',async t=>{
-    messages = await actions.private.call('getTokenFeed',mytoken.id)
-    console.log('result',messages)
-    t.end()
-  })
-  t.test('followers',async t=>{
-    const result = await actions.private.call('followers',mytoken.id,"1")
-    console.log('result',result)
-    t.end()
-  })
-  t.test('setDefaultThreshold',async t=>{
-    const result = await actions.private.call('setDefaultThreshold',"2")
-    console.log('result',result)
-    t.end()
-  })
-  t.test('getMessage',async t=>{
-    const result = await actions.private.call('getMessage',messages[0].id)
-    console.log('result',result)
-    t.end()
-  })
+  // t.test('sendMessage',async t=>{
+  //   const result = await actions.private.call('sendMessage',mytoken.id,'test')
+  //   console.log('result',result)
+  //   t.end()
+  // })
+  // t.test('getMyInbox',async t=>{
+  //   const result = await actions.private.call('getMyInbox')
+  //   console.log('result',result)
+  //   t.end()
+  // })
+  // t.test('getTokenFeed',async t=>{
+  //   messages = await actions.private.call('getTokenFeed',mytoken.id)
+  //   console.log('result',messages)
+  //   t.end()
+  // })
+  // t.test('followers',async t=>{
+  //   const result = await actions.private.call('followers',mytoken.id,"1")
+  //   console.log('result',result)
+  //   t.end()
+  // })
+  // t.test('setDefaultThreshold',async t=>{
+  //   const result = await actions.private.call('setDefaultThreshold',"2")
+  //   console.log('result',result)
+  //   t.end()
+  // })
+  // t.test('getMessage',async t=>{
+  //   const result = await actions.private.call('getMessage',messages[0].id)
+  //   console.log('result',result)
+  //   t.end()
+  // })
 
 
 })
