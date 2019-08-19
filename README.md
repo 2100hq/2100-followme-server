@@ -10,7 +10,7 @@ express.port=5498
 rethink.db=followme
 2100.host=ws://socket.staging.2100.co
 # a users default messaging threshold
-defaultThreshold=.01
+defaultThreshold=1
 # the id of the public feed, should be something that wont collide with other addresses
 # it defaults to '0x0'
 publicFeedId=0x0
@@ -46,7 +46,7 @@ Parameters are sent attached to the data attribute for POST.
 ```
   options.data = [param1,param2]
 
-  //example for /private/sendMessage(tokenid:string,message:string,threshold:number) => message
+  //example for /private/sendMessage(tokenid:string,message:string,threshold:string) => message
 
   options.data = [
     tokenid,
@@ -74,9 +74,9 @@ Returns your currently authenticated user. You can use this to test if auth work
 Check what 2100 tokens you own. This is the equivalent of your owned twitter addresses on 
 the 2100 app. 
 
-#### POST private/sendMessage(tokenid:string,message:string,threshold:number) => message
+#### POST private/sendMessage(tokenid:string,message:string,threshold:string) => message
 Post a message to your 2100 token channel. This message will also be sent to any users who
-hold any of your tokens over threshold. There is a default threshold set to 1 cent if you 
+hold any of your tokens over threshold. There is a default threshold set to 1/10**18 token if you 
 do not provide a threshold.
 
 #### POST private/getMyInbox(start:Date,end:Date) => message[]
@@ -87,10 +87,10 @@ must be less than the end date. If not supplied start=0 and end=Date.now()
 Get all messages posted by a 2100 owner on their token. This will only return 
 messages you are authorized to view.
 
-#### POST private/followers(tokenid:string,threshold:number) => userids[]
+#### POST private/followers(tokenid:string,threshold:string) => userids[]
 See a list of users who own more than threshold of your token. You must own the token.
 
-#### POST private/setDefaultThreshold(threshold:number) => user
+#### POST private/setDefaultThreshold(threshold:string) => user
 Set your default message threshold visibility when sending a message to your followers.
 This can also be overridden by explicitly setting it when calling `private/sendMessage`.
 

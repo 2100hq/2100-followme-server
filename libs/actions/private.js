@@ -1,7 +1,6 @@
 const assert = require('assert')
 const lodash = require('lodash')
 const Promise = require('bluebird')
-const {ethToWei} = require('../utils')
 const bn = require('bignumber.js')
 
 module.exports = (config,{x2100,users,messages,threads})=>{
@@ -12,7 +11,7 @@ module.exports = (config,{x2100,users,messages,threads})=>{
   assert(publicFeedId,'requires public feed id')
   return user=>{
     assert(user,'you must login')
-    const defaultThreshold = user.defaultThreshold || config.defaultThreshold || 0
+    const defaultThreshold = user.defaultThreshold || config.defaultThreshold || "1"
     const actions = {
       me(){
         return user
@@ -24,7 +23,6 @@ module.exports = (config,{x2100,users,messages,threads})=>{
         return users.setDefaultThreshold(user.id,threshold)
       },
       async followers(tokenid,threshold=defaultThreshold){
-        threshold = ethToWei(threshold)
         assert(await x2100.public.call('isOwner',user.id,tokenid),'You are not the token owner')
         const followers = await x2100.public.call('tokenHolders',tokenid)
 
@@ -44,7 +42,7 @@ module.exports = (config,{x2100,users,messages,threads})=>{
           message,
           userid:user.id,
           tokenid:tokenid,
-          threshold: ethToWei(threshold),
+          threshold,
         })
 
         // get follower ids; this excludes the owner
