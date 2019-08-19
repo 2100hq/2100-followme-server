@@ -13,7 +13,7 @@ module.exports = (config,{x2100,users,messages,threads})=>{
   return user=>{
     assert(user,'you must login')
     const defaultThreshold = user.defaultThreshold || config.defaultThreshold || 0
-    return {
+    const actions = {
       me(){
         return user
       },
@@ -37,31 +37,29 @@ module.exports = (config,{x2100,users,messages,threads})=>{
       async sendMessage(tokenid,message,threshold=defaultThreshold){
         assert(await x2100.public.call('isOwner',user.id,tokenid),'You are not the token owner')
 
-        threshold = ethToWei(threshold)
-
-        const followers = await x2100.public.call('tokenHolders',tokenid)
-
-        message =  await messages.create({
+        message = await messages.create({
           message,
           userid:user.id,
           tokenid:tokenid,
-          threshold,
+          threshold: ethToWei(threshold),
         })
 
-        //add message to tokens feed
-        await threads.create({threadid:tokenid,messageid:message.id})
+        // get follower ids; this excludes the owner
+        const recipientIds = Object.keys(await actions.followers(tokenid, threshold))
 
-        //add anonymized message to public feed
-        await threads.create({threadid:publicFeedId,messageid:message.id})
+        //add owner to recipients
+        recipientIds.unshift(user.id)
+        //add token feed to recipients
+        recipientIds.unshift(tokenid)
+        //add anonymized public feed to recipients
+        recipientIds.unshift(publicFeedId)
 
-        //add messages to followers inboxes
-        const qualified = lodash(followers).entries().filter(([userid,amount])=>{
-          return bn(amount).isGreaterThanOrEqualTo(threshold)
-        }).map(([userid,amount])=>{
-          return threads.create({threadid:userid,messageid:message.id})
-        }).value()
+        //add messages to recipient inboxes
+        const sent = recipientIds.map(threadid=>{
+          return threads.create({threadid,messageid:message.id})
+        })
 
-        await Promise.all(qualified)
+        await Promise.all(sent)
 
         return message
       },
@@ -106,5 +104,6 @@ module.exports = (config,{x2100,users,messages,threads})=>{
         })
       }
     }
+    return actions
   }
 }
