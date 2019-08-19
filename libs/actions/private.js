@@ -13,7 +13,7 @@ module.exports = (config,{x2100,users,messages,threads})=>{
   return user=>{
     assert(user,'you must login')
     const defaultThreshold = user.defaultThreshold || config.defaultThreshold || 0
-    return {
+    const actions = {
       me(){
         return user
       },
@@ -106,5 +106,6 @@ module.exports = (config,{x2100,users,messages,threads})=>{
         })
       }
     }
+    return actions
   }
 }
