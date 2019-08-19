@@ -47,6 +47,9 @@ module.exports = (config,{x2100,users,messages,threads})=>{
         // get followers; this excludes the owner
         const qualified = await actions.followers(tokenid, threshold)
 
+        //add message to owners feed
+        await threads.create({threadid:user.id,messageid:message.id})
+
         //add message to tokens feed
         await threads.create({threadid:tokenid,messageid:message.id})
 
