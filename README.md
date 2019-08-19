@@ -9,7 +9,14 @@ service=followme
 express.port=5498
 rethink.db=followme
 2100.host=ws://socket.staging.2100.co
+# a users default messaging threshold
 defaultThreshold=.01
+# the id of the public feed, should be something that wont collide with other addresses
+# it defaults to '0x0'
+publicFeedId=0x0
+# leave blank to use 2100 token auth, otherwise set to true. If true pass your user id
+# as your bearer token. 
+disableAuth=
 ```
 
 ## API
