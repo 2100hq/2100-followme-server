@@ -87,6 +87,12 @@ See a list of users who own more than threshold of your token. You must own the 
 Set your default message threshold visibility when sending a message to your followers.
 This can also be overridden by explicitly setting it when calling `private/sendMessage`.
 
+#### POST private/getMessage(messageid:string) => message
+Decodes a single message id. It will require that you qualify to read the message
+otherwise will just return you the hidden message back. If you qualify it will return
+the full message object.
+
+
 
 
 
