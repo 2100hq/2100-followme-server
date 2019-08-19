@@ -45,7 +45,7 @@ test('express',t=>{
       public:Actions(host)('public'),
       private:Actions(host)('private'),
     }
-    actions.private.setToken(userid)
+    actions.private.setToken(config.test.tokenid)
     t.end()
   })
   t.test('echo',async t=>{

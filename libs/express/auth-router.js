@@ -14,6 +14,7 @@ module.exports = (config, {users,authenticate}) => {
       next()
     })
     .catch(err=>{
+      console.log('auth err',err)
       next()
     })
   })

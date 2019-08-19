@@ -15,7 +15,6 @@ exports.loop = async (fn, delay = 1000, max, count = 0, result) => {
 exports.IncreasingId = (start=0,max=10000000)=>{
   let nonce = start
   return (prefix=Date.now())=>{
-    console.log('prefix',prefix)
     const id = [prefix,pad(8,nonce,'0')].join('!')
     nonce = (nonce + 1) % max
     return id

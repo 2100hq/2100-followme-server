@@ -14,10 +14,11 @@ module.exports = async (config)=>{
   const libs = await InitRethink(config,{con},(...args)=>events.emit('models',args))
 
 
+  const x2100Api = await x2100(config[2100].host)
   libs.x2100 ={
-    public:await x2100(config[2100].host,'public'),
+    public:x2100Api('public'),
+    auth:  x2100Api('auth'),
     // private:x2100(config[2100].host,'private'),
-    // auth:x2100(config[2100].host,'auth'),
   }
 
   // libs.joins = await Joins(config,libs)
@@ -28,9 +29,14 @@ module.exports = async (config)=>{
     auth:Actions('auth',config,libs),
   }
 
-
-  libs.authenticate = async function(userid){
-    return userid.toLowerCase()
+  libs.authenticate = async function(tokenid){
+    if(config.disableAuth){
+      //this should be userid if auth is disabled
+      return tokenid
+    }else{
+      //this returns 2100 userid
+      return libs.x2100.auth.call('user',tokenid)
+    }
   }
 
 
