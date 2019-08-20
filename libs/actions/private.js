@@ -39,15 +39,16 @@ module.exports = (config,{x2100,users,messages,threads})=>{
         assert(await x2100.public.call('isOwner',user.id,tokenid),'You are not the token owner')
         assert(bn(threshold).gt(0), 'You must set a threshold greater than zero')
 
+        // get follower ids; this excludes the owner
+        const recipientIds = Object.keys(await actions.followers(tokenid, threshold))
+
         message = await messages.create({
           message,
           userid:user.id,
           tokenid:tokenid,
           threshold,
+          recipientcount: recipientIds.length
         })
-
-        // get follower ids; this excludes the owner
-        const recipientIds = Object.keys(await actions.followers(tokenid, threshold))
 
         //add owner to recipients
         recipientIds.unshift(user.id)

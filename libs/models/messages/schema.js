@@ -5,5 +5,6 @@ module.exports = config => {
     message:'string',
     userid:'string',
     tokenid:'string',
+    recipientcount: 'number'
   }
 }
