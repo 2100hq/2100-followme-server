@@ -82,10 +82,10 @@ module.exports = (config,{x2100,users,messages,threads})=>{
         const myHolding = await x2100.public.call('userHolding',user.id,tokenid)
         const ownerAddress = await x2100.public.call('getTokenOwner',tokenid)
         const list = await threads.between(tokenid,start,end)
-
+        const isOwner = ownerAddress.toLowerCase() === user.id.toLowerCase()
         return Promise.map(list,async thread=>{
           const message = await messages.get(thread.messageid)
-          if(ownerAddress.toLowerCase() === user.id.toLowerCase())  return message
+          if (isOwner) return message
           if(bn(myHolding).isGreaterThanOrEqualTo(message.threshold)) return message
           return hideMessage(message)
         })
