@@ -57,12 +57,14 @@ module.exports = (config,{x2100,users,messages,threads})=>{
         //add anonymized public feed to recipients
         recipientIds.unshift(publicFeedId)
 
-        //add messages to recipient inboxes
-        const sent = recipientIds.map(threadid=>{
-          return threads.create({threadid,messageid:message.id})
+        setImmediate(async () => {
+          const sent = recipientIds.map(threadid=>{
+            return threads.create({threadid,messageid:message.id})
+          })
+
+          await Promise.all(sent).then( ()=> console.log('delivered',message.id))
         })
 
-        await Promise.all(sent)
 
         return message
       },
