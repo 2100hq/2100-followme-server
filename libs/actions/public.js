@@ -1,5 +1,6 @@
 const assert = require('assert')
 const Promise = require('bluebird')
+const { hideMessage } = require('../utils')
 module.exports = (config,{threads,messages}) => {
   const {publicFeedId} = config
   assert(threads,'requires threads')
@@ -14,17 +15,7 @@ module.exports = (config,{threads,messages}) => {
         const list = await threads.between(publicFeedId,start,end)
         const ms = await messages.getAll(list.map(x=>x.messageid))
 
-        return ms.map(message=>{
-          return {
-            id:message.id,
-            userid:message.userid,
-            created:message.created,
-            length:message.message.length,
-            threshold:message.threshold,
-            tokenid:message.tokenid,
-            hidden:true,
-          }
-        })
+        return ms.map(hideMessage)
       }
     }
   }

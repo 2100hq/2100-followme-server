@@ -2,7 +2,7 @@ const assert = require('assert')
 const lodash = require('lodash')
 const Promise = require('bluebird')
 const bn = require('bignumber.js')
-
+const { hideMessage } = require('../utils')
 module.exports = (config,{x2100,users,messages,threads})=>{
   assert(x2100,'requires 2100 client')
   assert(messages,'requires messages')
@@ -76,15 +76,7 @@ module.exports = (config,{x2100,users,messages,threads})=>{
         const message = await messages.get(messageid)
         const myHolding = await x2100.public.call('userHolding',user.id,message.tokenid)
         if(bn(myHolding).isGreaterThanOrEqualTo(message.threshold)) return message
-        return {
-          id:message.id,
-          userid:message.userid,
-          created:message.created,
-          length:message.message.length,
-          threshold:message.threshold,
-          tokenid:message.tokenid,
-          hidden:true,
-        }
+        return hideMessage(message)
       },
       async getTokenFeed(tokenid,start,end){
         const myHolding = await x2100.public.call('userHolding',user.id,tokenid)
@@ -95,15 +87,7 @@ module.exports = (config,{x2100,users,messages,threads})=>{
           const message = await messages.get(thread.messageid)
           if(ownerAddress.toLowerCase() === user.id.toLowerCase())  return message
           if(bn(myHolding).isGreaterThanOrEqualTo(message.threshold)) return message
-          return {
-            id:message.id,
-            userid:message.userid,
-            created:message.created,
-            length:message.message.length,
-            threshold:message.threshold,
-            tokenid:message.tokenid,
-            hidden:true,
-          }
+          return hideMessage(message)
         })
       }
     }

@@ -35,3 +35,15 @@ exports.RethinkConnection = async config => {
 exports.ethToWei = eth => {
   return bn(eth).times('10000000000000000').toString()
 }
+
+exports.hideMessage = message => {
+  return {
+    id:message.id,
+    userid:message.userid,
+    created:message.created,
+    length:message.message.length,
+    threshold:message.threshold,
+    tokenid:message.tokenid,
+    hidden:true,
+  }
+}
