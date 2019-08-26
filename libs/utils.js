@@ -44,6 +44,7 @@ exports.hideMessage = message => {
     length:message.message.length,
     threshold:message.threshold,
     tokenid:message.tokenid,
+    hint:message.hint,
     hidden:true,
   }
 }
