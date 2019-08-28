@@ -1,6 +1,5 @@
 const assert = require('assert')
 const lodash = require('lodash')
-const Promise = require('bluebird')
 const bn = require('bignumber.js')
 const { hideMessage } = require('../utils')
 module.exports = (config,{x2100,users,messages,threads})=>{
@@ -59,11 +58,12 @@ module.exports = (config,{x2100,users,messages,threads})=>{
         recipientIds.unshift(publicFeedId)
 
         setImmediate(async () => {
-          const sent = recipientIds.map(threadid=>{
-            return threads.create({threadid,messageid:message.id})
-          })
+          await Promise.all(recipientIds.map(threadid=>{
+              return threads.create({threadid,messageid:message.id})
+            })
+          )
 
-          await Promise.all(sent).then( ()=> console.log('delivered',message.id))
+          console.log('delivered all',message.id)
         })
 
 
@@ -71,9 +71,15 @@ module.exports = (config,{x2100,users,messages,threads})=>{
       },
       async getMyInbox(start=0,end=Date.now()){
         const list = await threads.between(user.id,start,end)
-        return Promise.map(list,thread=>{
-          return messages.get(thread.messageid)
-        })
+        return Promise.all(list.map(thread=>{
+            try {
+              return messages.get(thread.messageid)
+            } catch(e){
+              console.log(thread.messageid)
+            }
+
+          })
+        )
       },
       async getMessage(messageid){
         const message = await messages.get(messageid)
@@ -86,12 +92,14 @@ module.exports = (config,{x2100,users,messages,threads})=>{
         const ownerAddress = await x2100.public.call('getTokenOwner',tokenid)
         const list = await threads.between(tokenid,start,end)
         const isOwner = ownerAddress.toLowerCase() === user.id.toLowerCase()
-        return Promise.map(list,async thread=>{
-          const message = await messages.get(thread.messageid)
-          if (isOwner) return message
-          if(bn(myHolding).isGreaterThanOrEqualTo(message.threshold)) return message
-          return hideMessage(message)
-        })
+        return Promise.all(list.map(async thread=>{
+            const message = await messages.get(thread.messageid)
+            if (isOwner) return message
+            if(bn(myHolding).isGreaterThanOrEqualTo(message.threshold)) return message
+            return hideMessage(message)
+          })
+        )
+      },
       async destroy(messageid){
         const message = await messages.get(messageid)
         assert(message.userid.toLowerCase() === user.id.toLowerCase(), 'You do not have permission to destroy this message')
