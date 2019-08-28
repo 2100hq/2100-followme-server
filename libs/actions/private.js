@@ -92,6 +92,10 @@ module.exports = (config,{x2100,users,messages,threads})=>{
           if(bn(myHolding).isGreaterThanOrEqualTo(message.threshold)) return message
           return hideMessage(message)
         })
+      async destroy(messageid){
+        const message = await messages.get(messageid)
+        assert(message.userid.toLowerCase() === user.id.toLowerCase(), 'You do not have permission to destroy this message')
+        await Promise.all([messages.destroy(messageid), threads.destroyByMessageid(messageid)])
       }
     }
     return actions

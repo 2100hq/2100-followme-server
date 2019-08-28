@@ -22,6 +22,9 @@ module.exports = async (config, con) => {
     set(id,props){
       return table.upsert(props)
     },
+    destroyByMessageid(messageid){
+      return table.run(table.table().filter({messageid}).delete())
+    },
     between(threadid,start=0,end=Date.now()){
       const query = table.table()
         .between([threadid,start].join('!'),[threadid,end].join('!'),{rightBound:'open',leftBound:'open'})

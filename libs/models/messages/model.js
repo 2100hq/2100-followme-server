@@ -27,11 +27,16 @@ module.exports = (config,table,emit=x=>x) => {
     return result
   }
 
+  function destroy(id){
+    return table.destroy(id)
+  }
+
   return {
     ...table,
     get,
     set,
     create,
+    destroy
   }
 
 }

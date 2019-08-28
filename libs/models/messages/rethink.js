@@ -21,6 +21,9 @@ module.exports = async (config, con) => {
     set(id,props){
       return table.upsert(props)
     },
+    destroy(id){
+      return table.run(table.table().get(id).delete())
+    },
   }
 }
 

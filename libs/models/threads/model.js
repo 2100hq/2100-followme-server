@@ -27,11 +27,17 @@ module.exports = (config,table,emit=x=>x) => {
     return result
   }
 
+  function destroyByMessageid(messageid){
+    return table.destroyByMessageid(messageid)
+  }
+
+
   return {
     ...table,
     get,
     set,
     create,
+    destroyByMessageid
   }
 
 }
