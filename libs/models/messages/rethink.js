@@ -6,7 +6,7 @@ module.exports = async (config, con) => {
 
   const schema = {
     table: config.table,
-    indices: ['username'],
+    indices: ['username', 'shortid'],
   }
 
   const table = await Table(con, schema)
@@ -18,6 +18,9 @@ module.exports = async (config, con) => {
 
   return {
     ...table,
+    getByShortId(id){
+      return table.getBy('shortid', id)
+    },
     set(id,props){
       return table.upsert(props)
     },

@@ -8,6 +8,7 @@ const x2100 = require('../../2100')
 module.exports = async (config)=>{
   config.publicFeedId = config.publicFeedId || '0x0'
   config.defaultThreshold = config.defaultThreshold || "1"
+  config.shortIdLength = config.shortIdLength || 7
 
   const con = await RethinkConnection(config.rethink)
   const events = new Events()

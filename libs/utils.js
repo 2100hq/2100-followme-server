@@ -3,6 +3,7 @@ const assert = require('assert')
 const pad = require('pad')
 const Rethink = require('rethinkdb')
 const bn = require('bignumber.js')
+const shortlink = require('shortlink')
 
 exports.loop = async (fn, delay = 1000, max, count = 0, result) => {
   assert(lodash.isFunction(fn), 'loop requires a function')
@@ -48,3 +49,5 @@ exports.hideMessage = message => {
     hidden:true,
   }
 }
+
+exports.shortId = length => shortlink.generate(length)

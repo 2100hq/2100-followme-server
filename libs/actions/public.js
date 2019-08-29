@@ -18,6 +18,11 @@ module.exports = (config,{threads,messages}) => {
           return hideMessage(message)
         })
       },
+      async getMessage(messageid){
+        console.log('public getMessage', messageid)
+        const message = await messages.get(messageid)
+        return hideMessage(message)
+      },
       async feed(start,end){
         const list = await threads.between(publicFeedId,start,end)
         const ms = await messages.getAll(list.map(x=>x.messageid))

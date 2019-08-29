@@ -898,6 +898,11 @@ setprototypeof@1.1.1:
   resolved "https://registry.yarnpkg.com/setprototypeof/-/setprototypeof-1.1.1.tgz#7e95acb24aa92f5885e0abef5ba131330d4ae683"
   integrity sha512-JvdAWfbXeIGaZ9cILp38HntZSFSo3mWg6xGcJJsd+d4aRMOqauag1C63dJfDw7OaMYwEbHMOxEZ1lqVRYP2OAw==
 
+shortlink@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/shortlink/-/shortlink-1.1.0.tgz#b9c4ce003fb4d5bc5948843c7077c5074a3508bb"
+  integrity sha1-ucTOAD+01bxZSIQ8cHfFB0o1CLs=
+
 socket.io-adapter@~1.1.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/socket.io-adapter/-/socket.io-adapter-1.1.1.tgz#2a805e8a14d6372124dd9159ad4502f8cb07f06b"

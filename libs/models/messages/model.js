@@ -8,6 +8,10 @@ module.exports = (config,table,emit=x=>x) => {
   const defaults = Defaults()
   const validate = Validate(Schema())
 
+  function isShortId(id){
+    return id.indexOf('-') === -1
+  }
+
   async function create(props) {
     props = defaults(props)
     if(props.id) assert(!await table.has(props.id), 'Message exists with id')
@@ -22,7 +26,12 @@ module.exports = (config,table,emit=x=>x) => {
   }
 
   async function get(id) {
-    const result = await table.get(id)
+    let result
+    if (isShortId(id)){
+      result = (await table.getByShortId(id))[0]
+    } else {
+      result = await table.get(id)
+    }
     assert(result, 'Message not found')
     return result
   }

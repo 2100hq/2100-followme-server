@@ -1,12 +1,12 @@
 const assert = require('assert')
 const lodash = require('lodash')
 const bn = require('bignumber.js')
-const { hideMessage } = require('../utils')
+const { hideMessage, shortId } = require('../utils')
 module.exports = (config,{x2100,users,messages,threads})=>{
   assert(x2100,'requires 2100 client')
   assert(messages,'requires messages')
   assert(threads,'requires threads')
-  const {publicFeedId} = config
+  const {publicFeedId, shortIdLength} = config
   assert(publicFeedId,'requires public feed id')
   return user=>{
     assert(user,'you must login')
@@ -47,6 +47,7 @@ module.exports = (config,{x2100,users,messages,threads})=>{
           tokenid,
           threshold,
           hint,
+          shortid: shortId(shortIdLength),
           recipientcount: recipientIds.length
         })
 
@@ -83,7 +84,12 @@ module.exports = (config,{x2100,users,messages,threads})=>{
       },
       async getMessage(messageid){
         const message = await messages.get(messageid)
-        const myHolding = await x2100.public.call('userHolding',user.id,message.tokenid)
+        let myHolding = "0"
+        try {
+          myHolding = await x2100.public.call('userHolding',user.id,message.tokenid)
+        } catch(e){
+          console.log('2100 error', e)
+        }
         if(bn(myHolding).isGreaterThanOrEqualTo(message.threshold)) return message
         return hideMessage(message)
       },
