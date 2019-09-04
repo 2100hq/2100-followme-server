@@ -90,7 +90,20 @@ module.exports = (config,{x2100,users,messages,threads})=>{
         } catch(e){
           console.log('2100 error', e)
         }
-        if(bn(myHolding).isGreaterThanOrEqualTo(message.threshold)) return message
+
+        if(bn(myHolding).isGreaterThanOrEqualTo(message.threshold)) {
+
+          // in the background, publish this message to user's inbox so they dont have to decode again
+          threads.getByThreadIdMessageId(user.id, message.id).then( async result => {
+            if (result.length > 0) return
+            await threads.create({created: message.created, threadid: user.id,messageid:message.id})
+            message.recipientcount = message.recipientcount+1
+            await messages.set(message)
+          })
+
+          return message
+        }
+
         return hideMessage(message)
       },
       async getTokenFeed(tokenid,start,end){

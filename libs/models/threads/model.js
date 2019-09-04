@@ -31,13 +31,18 @@ module.exports = (config,table,emit=x=>x) => {
     return table.destroyByMessageid(messageid)
   }
 
+  function getByThreadIdMessageId(threadid, messageid){
+    return table.filter({threadid, messageid})
+  }
+
 
   return {
     ...table,
     get,
     set,
     create,
-    destroyByMessageid
+    destroyByMessageid,
+    getByThreadIdMessageId
   }
 
 }
