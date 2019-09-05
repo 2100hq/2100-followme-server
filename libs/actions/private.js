@@ -1,7 +1,9 @@
 const assert = require('assert')
 const lodash = require('lodash')
 const bn = require('bignumber.js')
-const { hideMessage, shortId } = require('../utils')
+const { hideMessage, shortId, getLinkMetadata, showMessage } = require('../utils')
+
+
 module.exports = (config,{x2100,users,messages,threads})=>{
   assert(x2100,'requires 2100 client')
   assert(messages,'requires messages')
@@ -41,6 +43,8 @@ module.exports = (config,{x2100,users,messages,threads})=>{
         // get follower ids; this excludes the owner
         const recipientIds = Object.keys(await actions.followers(tokenid, threshold))
 
+        const linkMetadata = await getLinkMetadata(message)
+
         message = await messages.create({
           message,
           userid:user.id,
@@ -48,7 +52,8 @@ module.exports = (config,{x2100,users,messages,threads})=>{
           threshold,
           hint,
           shortid: shortId(shortIdLength),
-          recipientcount: recipientIds.length
+          recipientcount: recipientIds.length,
+          linkMetadata
         })
 
         //add owner to recipients
@@ -56,6 +61,7 @@ module.exports = (config,{x2100,users,messages,threads})=>{
         //add token feed to recipients
         recipientIds.unshift(tokenid)
         //add anonymized public feed to recipients
+
         recipientIds.unshift(publicFeedId)
 
         setImmediate(async () => {
@@ -63,16 +69,15 @@ module.exports = (config,{x2100,users,messages,threads})=>{
               return threads.create({threadid,messageid:message.id})
             })
           )
-
           console.log('delivered all',message.id)
         })
 
 
-        return message
+        return showMessage(message)
       },
       async getMyInbox(start=0,end=Date.now()){
         const list = await threads.between(user.id,start,end)
-        return Promise.all(list.map(thread=>{
+        const inbox = await Promise.all(list.map(thread=>{
             try {
               return messages.get(thread.messageid)
             } catch(e){
@@ -81,6 +86,7 @@ module.exports = (config,{x2100,users,messages,threads})=>{
 
           })
         )
+        return inbox.map(showMessage)
       },
       async getMessage(messageid){
         const message = await messages.get(messageid)
@@ -101,7 +107,7 @@ module.exports = (config,{x2100,users,messages,threads})=>{
             await messages.set(message)
           })
 
-          return message
+          return showMessage(message)
         }
 
         return hideMessage(message)
@@ -113,8 +119,8 @@ module.exports = (config,{x2100,users,messages,threads})=>{
         const isOwner = ownerAddress.toLowerCase() === user.id.toLowerCase()
         return Promise.all(list.map(async thread=>{
             const message = await messages.get(thread.messageid)
-            if (isOwner) return message
-            if(bn(myHolding).isGreaterThanOrEqualTo(message.threshold)) return message
+            if (isOwner) return showMessage(message)
+            if(bn(myHolding).isGreaterThanOrEqualTo(message.threshold)) return showMessage(message)
             return hideMessage(message)
           })
         )

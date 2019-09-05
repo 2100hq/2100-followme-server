@@ -20,6 +20,7 @@
     "express": "^4.17.1",
     "express-bearer-token": "^2.4.0",
     "fastest-validator": "^0.6.17",
+    "get-urls": "^9.1.0",
     "highland": "^2.13.5",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
@@ -29,10 +30,14 @@
     "shortlink": "^1.1.0",
     "socket.io": "^2.2.0",
     "socket.io-client": "^2.2.0",
+    "unfurl-url": "^1.0.0",
+    "unfurl.js": "^4.0.1",
+    "url-regex": "^5.0.0",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
     "axios": "^0.19.0",
+    "fsmonitor": "^0.2.4",
     "tape": "^4.11.0"
   }
 }

@@ -4,6 +4,13 @@ const pad = require('pad')
 const Rethink = require('rethinkdb')
 const bn = require('bignumber.js')
 const shortlink = require('shortlink')
+const urlRegex = require('url-regex');
+const getUrls = require('get-urls');
+const {unfurl} = require('unfurl.js')
+let {url:unminifyUrl}  = require('unfurl-url');
+const {promisify} = require('util')
+const nodeURL = require('url');
+unminifyUrl=promisify(unminifyUrl)
 
 exports.loop = async (fn, delay = 1000, max, count = 0, result) => {
   assert(lodash.isFunction(fn), 'loop requires a function')
@@ -47,7 +54,72 @@ exports.hideMessage = message => {
     tokenid:message.tokenid,
     hint:message.hint,
     hidden:true,
+    type: exports.getMessageType(message)
   }
 }
 
+exports.showMessage = message => {
+  message.type = exports.getMessageType(message)
+  message.link = exports.getUrl(message)
+  const {linkMetadata, ...visible} = message
+  return visible
+}
+
 exports.shortId = length => shortlink.generate(length)
+
+exports.isImageUrl = url => /\.png|jpg|gif$/.test(nodeURL.parse(url||'').pathname)
+exports.isImageContentType = contentType => /image/i.test(contentType)
+
+exports.getLinkMetadata = async message => {
+  let linkMetadata
+  let url = Array.from(getUrls(message))[0]
+  if (!url) return null
+  url = await unminifyUrl(url)
+  try {
+    linkMetadata = await unfurl(url) // this throws sometimes
+  } catch(e){
+    console.log('UNFURL threw')
+    console.log(url)
+    console.log(e);
+    console.log();
+
+    if (e.info) linkMetadata = e.info
+  }
+  if (!linkMetadata) return null
+  return JSON.parse(JSON.stringify({...linkMetadata, url})) // sanitize linkMetaData
+}
+
+exports.getMessageType = messagedoc => {
+  let type
+  let { linkMetadata, message } = messagedoc
+
+  if (!linkMetadata) return 'text'
+  const {url, contentType} = linkMetadata
+  // if message contains only a link
+  if (urlRegex({exact: true, strict: false}).test(message)){
+    type = 'link'
+  } else {
+    return 'text'
+  }
+
+  // if link is an image, label it and return
+  if (exports.isImageUrl(url) || exports.isImageContentType(contentType)) return 'image'
+
+  // process metadata
+  let siteName = lodash.get(linkMetadata, 'open_graph.site_name')
+  if (!/twitter|youtube|imgur|medium/i.test(siteName)) siteName = null
+  if (/twitter/i.test(siteName) && !/status/i.test(nodeURL.parse(url).pathname)) siteName = null // not a status update
+  let ogType = lodash.get(linkMetadata, 'open_graph.type')
+
+  if (/video/i.test(ogType)) ogType = 'video'
+  if (/image/i.test(ogType)) ogType = 'image'
+
+  if (!/image|video/.test(ogType)) ogType = null
+
+  type = siteName || ogType || type
+
+  return type.toLowerCase()
+}
+
+exports.getFavicon = messagedoc => lodash.get(messagedoc, 'linkMetadata.favicon')
+exports.getUrl = messagedoc => lodash.get(messagedoc, 'linkMetadata.url')
