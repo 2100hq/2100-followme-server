@@ -60,7 +60,7 @@ exports.hideMessage = message => {
 
 exports.showMessage = message => {
   message.type = exports.getMessageType(message)
-  message.link = exports.getUrl(message)
+  message.link = exports.getLink(message)
   const {linkMetadata, ...visible} = message
   return visible
 }
@@ -94,7 +94,9 @@ exports.getMessageType = messagedoc => {
   let { linkMetadata, message } = messagedoc
 
   if (!linkMetadata) return 'text'
-  const {url, contentType} = linkMetadata
+  let {contentType} = linkMetadata
+  const url = exports.getLink(messagedoc)
+
   // if message contains only a link
   if (urlRegex({exact: true, strict: false}).test(message)){
     type = 'link'
@@ -107,7 +109,7 @@ exports.getMessageType = messagedoc => {
 
   // process metadata
   let siteName = lodash.get(linkMetadata, 'open_graph.site_name')
-  if (!/twitter|youtube|imgur|medium/i.test(siteName)) siteName = null
+  if (!/twitter|youtube|imgur/i.test(siteName)) siteName = null
   if (/twitter/i.test(siteName) && !/status/i.test(nodeURL.parse(url).pathname)) siteName = null // not a status update
   let ogType = lodash.get(linkMetadata, 'open_graph.type')
 
@@ -122,4 +124,18 @@ exports.getMessageType = messagedoc => {
 }
 
 exports.getFavicon = messagedoc => lodash.get(messagedoc, 'linkMetadata.favicon')
-exports.getUrl = messagedoc => lodash.get(messagedoc, 'linkMetadata.url')
+
+// link differs from 'linkMetadata.url' in that it uses the open graph url to the media, and other stuff for imgur
+exports.getLink = messagedoc => {
+  const { linkMetadata } = messagedoc
+  if (!linkMetadata) return
+  let {url} = linkMetadata
+  url = lodash.get(linkMetadata, 'open_graph.url', url)
+  let siteName = lodash.get(linkMetadata, 'open_graph.site_name')
+  if (/imgur/i.test(siteName)) {
+    const streamurl = lodash.get(linkMetadata, 'twitter_card.players[0].stream')
+    const imageurl = lodash.get(linkMetadata, 'twitter_card.images[0].url')
+    url = streamurl || imageurl || url
+  }
+  return url
+}
