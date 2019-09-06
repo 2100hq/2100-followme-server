@@ -28,6 +28,7 @@ module.exports = (config,{x2100,users,messages,threads})=>{
         const followers = await x2100.public.call('tokenHolders',tokenid)
 
         return Object.entries(followers).filter(([userid,amount])=>{
+          if (parseInt(userid) === 0) return false // zero address
           if (userid.toLowerCase() === user.id.toLowerCase()) return false // exclude the owner from the list of followers
           return bn(amount).isGreaterThanOrEqualTo(threshold)
         }).reduce((obj, [userid,amount])=>{
@@ -52,6 +53,7 @@ module.exports = (config,{x2100,users,messages,threads})=>{
           threshold,
           hint,
           shortid: shortId(shortIdLength),
+          recipients: recipientIds,
           recipientcount: recipientIds.length,
           linkMetadata
         })
@@ -104,6 +106,7 @@ module.exports = (config,{x2100,users,messages,threads})=>{
             if (result.length > 0) return
             await threads.create({created: message.created, threadid: user.id,messageid:message.id})
             message.recipientcount = message.recipientcount+1
+            message.recipients.push(user.id)
             await messages.set(message)
           })
 

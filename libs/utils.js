@@ -54,7 +54,9 @@ exports.hideMessage = message => {
     tokenid:message.tokenid,
     hint:message.hint,
     hidden:true,
-    type: exports.getMessageType(message)
+    type: exports.getMessageType(message),
+    recipientCount: message.recipientCount,
+    recipients: message.recipients
   }
 }
 
