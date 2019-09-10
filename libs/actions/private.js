@@ -53,7 +53,7 @@ module.exports = (config,{x2100,users,messages,threads})=>{
           threshold,
           hint,
           shortid: shortId(shortIdLength),
-          recipients: recipientIds,
+          recipients: [...recipientIds],
           recipientcount: recipientIds.length,
           linkMetadata
         })
