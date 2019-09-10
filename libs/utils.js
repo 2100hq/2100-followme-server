@@ -61,10 +61,10 @@ exports.hideMessage = message => {
 }
 
 exports.showMessage = message => {
-  message.type = exports.getMessageType(message)
-  message.link = exports.getLink(message)
+  const type = exports.getMessageType(message)
+  const link = exports.getLink(message)
   const {linkMetadata, ...visible} = message
-  return visible
+  return {...visible, type, link}
 }
 
 exports.shortId = length => shortlink.generate(length)
