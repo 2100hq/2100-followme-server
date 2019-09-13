@@ -93,6 +93,7 @@ exports.getLinkMetadata = async message => {
 }
 
 exports.getMessageType = messagedoc => {
+  if (/meme/i.test(messagedoc.type)) return messagedoc.type
   let type
   let { linkMetadata, message } = messagedoc
 
