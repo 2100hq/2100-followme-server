@@ -37,7 +37,7 @@ module.exports = (config,{x2100,users,messages,threads})=>{
         }, {})
 
       },
-      async sendMessage(tokenid,message,hint,threshold=defaultThreshold){
+      async sendMessage(tokenid,message,hint,threshold=defaultThreshold,type=null){
         assert(await x2100.public.call('isOwner',user.id,tokenid),'You are not the token owner')
         assert(bn(threshold).gt(0), 'You must set a threshold greater than zero')
 
@@ -55,6 +55,7 @@ module.exports = (config,{x2100,users,messages,threads})=>{
           shortid: shortId(shortIdLength),
           recipients: [...recipientIds],
           recipientcount: recipientIds.length,
+          type,
           linkMetadata
         })
 
