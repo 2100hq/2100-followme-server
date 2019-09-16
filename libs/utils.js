@@ -49,6 +49,7 @@ exports.hideMessage = message => {
     id:message.id,
     userid:message.userid,
     created:message.created,
+    message: message.message.replace(/\S/g,'x'),
     length:message.message.length,
     threshold:message.threshold,
     tokenid:message.tokenid,
@@ -61,10 +62,10 @@ exports.hideMessage = message => {
 }
 
 exports.showMessage = message => {
-  message.type = exports.getMessageType(message)
-  message.link = exports.getLink(message)
+  const type = exports.getMessageType(message)
+  const link = exports.getLink(message)
   const {linkMetadata, ...visible} = message
-  return visible
+  return {...visible, type, link}
 }
 
 exports.shortId = length => shortlink.generate(length)
@@ -92,6 +93,7 @@ exports.getLinkMetadata = async message => {
 }
 
 exports.getMessageType = messagedoc => {
+  if (/meme/i.test(messagedoc.type)) return messagedoc.type
   let type
   let { linkMetadata, message } = messagedoc
 
