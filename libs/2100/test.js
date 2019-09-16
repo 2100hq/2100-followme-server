@@ -1,4 +1,4 @@
-const Client = require('.')
+const Client = require('2100-server/libs/socket/client')
 const Socket = require('./socket')
 const test = require('tape')
 
