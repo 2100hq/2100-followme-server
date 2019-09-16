@@ -70,36 +70,36 @@ test('express',t=>{
     mytoken = result[0]
     t.end()
   })
-  // t.test('sendMessage',async t=>{
-  //   const result = await actions.private.call('sendMessage',mytoken.id,'test')
-  //   console.log('result',result)
-  //   t.end()
-  // })
-  // t.test('getMyInbox',async t=>{
-  //   const result = await actions.private.call('getMyInbox')
-  //   console.log('result',result)
-  //   t.end()
-  // })
-  // t.test('getTokenFeed',async t=>{
-  //   messages = await actions.private.call('getTokenFeed',mytoken.id)
-  //   console.log('result',messages)
-  //   t.end()
-  // })
-  // t.test('followers',async t=>{
-  //   const result = await actions.private.call('followers',mytoken.id,"1")
-  //   console.log('result',result)
-  //   t.end()
-  // })
-  // t.test('setDefaultThreshold',async t=>{
-  //   const result = await actions.private.call('setDefaultThreshold',"2")
-  //   console.log('result',result)
-  //   t.end()
-  // })
-  // t.test('getMessage',async t=>{
-  //   const result = await actions.private.call('getMessage',messages[0].id)
-  //   console.log('result',result)
-  //   t.end()
-  // })
+  t.test('sendMessage',async t=>{
+    const result = await actions.private.call('sendMessage',mytoken.id,'test','test')
+    console.log('result',result)
+    t.end()
+  })
+  t.test('getMyInbox',async t=>{
+    const result = await actions.private.call('getMyInbox')
+    console.log('result',result)
+    t.end()
+  })
+  t.test('getTokenFeed',async t=>{
+    messages = await actions.private.call('getTokenFeed',mytoken.id)
+    console.log('result',messages)
+    t.end()
+  })
+  t.test('followers',async t=>{
+    const result = await actions.private.call('followers',mytoken.id,"1")
+    console.log('result',result)
+    t.end()
+  })
+  t.test('setDefaultThreshold',async t=>{
+    const result = await actions.private.call('setDefaultThreshold',"2")
+    console.log('result',result)
+    t.end()
+  })
+  t.test('getMessage',async t=>{
+    const result = await actions.private.call('getMessage',messages[0].id)
+    console.log('result',result)
+    t.end()
+  })
 
 
 })

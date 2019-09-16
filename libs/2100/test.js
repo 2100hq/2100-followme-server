@@ -32,7 +32,7 @@ test('2100 client',t=>{
     })
     t.test('public state',async t=>{
       const publicState = await client.public.call('state')
-      console.log('test',state)
+      console.log('public',state.public.stats.earned.latest)
       t.end()
     })
   })

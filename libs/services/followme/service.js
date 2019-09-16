@@ -3,7 +3,8 @@ const {RethinkConnection} = require('../../utils')
 const Express = require('../../express')
 const Events = require('events')
 const Actions = require('../../actions')
-const x2100 = require('../../2100')
+const Query = require('../../models/query')
+const x2100 = require('2100-server/libs/socket/client')
 
 module.exports = async (config)=>{
   config.publicFeedId = config.publicFeedId || '0x0'
@@ -15,15 +16,11 @@ module.exports = async (config)=>{
   const libs = await InitRethink(config,{con},(...args)=>events.emit('models',args))
 
 
-  const x2100Api = await x2100(config[2100].host)
-  libs.x2100 ={
-    public:x2100Api('public'),
-    auth:  x2100Api('auth'),
-    // private:x2100(config[2100].host,'private'),
-  }
+  libs.x2100State = {}
+  libs.x2100 = await x2100({host:config[2100].host,channels:['auth','public']},libs.x2100State)
 
   // libs.joins = await Joins(config,libs)
-  // libs.query = await Queries(config,libs)
+  libs.query = await Query(config,libs)
   libs.actions = {
     public:Actions('public',config,libs),
     private:Actions('private',config,libs),
