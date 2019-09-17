@@ -27,7 +27,7 @@ module.exports = (config,{x2100,users,messages,threads,query})=>{
       },
       async followers(tokenid,threshold=defaultThreshold){
         assert(await query.isOwner(user.id,tokenid),'You are not the token owner')
-        const followers = await query.tokenHolders('tokenid')
+        const followers = await query.tokenHolders(tokenid)
         // assert(await x2100.public.call('isOwner',user.id,tokenid),'You are not the token owner')
         // const followers = await x2100.public.call('tokenHolders',tokenid)
 

@@ -38,8 +38,8 @@ test('2100 client',t=>{
     })
     t.test('log state',t=>{
       setInterval(x=>{
-        console.log(state.public.stakes)
-        console.log(state.public.stats.global)
+        // console.log(state.public.stakes)
+        // console.log(state.public.stats.global)
         console.log(state.public.stats.earned)
       },1000)
     })
