@@ -47,7 +47,9 @@ module.exports = (config,{x2100,users,messages,threads,query})=>{
         assert(bn(threshold).gt(0), 'You must set a threshold greater than zero')
 
         // get follower ids; this excludes the owner
-        const recipientIds = Object.keys(await actions.followers(tokenid, threshold))
+        // const recipientIds = [] Object.keys(await actions.followers(tokenid, threshold))
+
+        const recipientIds = [] // don't deliver to any followers
 
         const linkMetadata = await getLinkMetadata(message)
 
