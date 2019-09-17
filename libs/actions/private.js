@@ -4,10 +4,11 @@ const bn = require('bignumber.js')
 const { hideMessage, shortId, getLinkMetadata, showMessage } = require('../utils')
 
 
-module.exports = (config,{x2100,users,messages,threads})=>{
+module.exports = (config,{x2100,users,messages,threads,query})=>{
   assert(x2100,'requires 2100 client')
   assert(messages,'requires messages')
   assert(threads,'requires threads')
+  assert(query,'requires query')
   const {publicFeedId, shortIdLength} = config
   assert(publicFeedId,'requires public feed id')
   return user=>{
@@ -18,14 +19,17 @@ module.exports = (config,{x2100,users,messages,threads})=>{
         return user
       },
       myTokens(){
-        return x2100.public.call('ownedTokens',user.id)
+        return query.ownedTokens(user.id)
+        // return x2100.public.call('ownedTokens',user.id)
       },
       setDefaultThreshold(threshold){
         return users.setDefaultThreshold(user.id,threshold)
       },
       async followers(tokenid,threshold=defaultThreshold){
-        assert(await x2100.public.call('isOwner',user.id,tokenid),'You are not the token owner')
-        const followers = await x2100.public.call('tokenHolders',tokenid)
+        assert(await query.isOwner(user.id,tokenid),'You are not the token owner')
+        const followers = await query.tokenHolders('tokenid')
+        // assert(await x2100.public.call('isOwner',user.id,tokenid),'You are not the token owner')
+        // const followers = await x2100.public.call('tokenHolders',tokenid)
 
         return Object.entries(followers).filter(([userid,amount])=>{
           if (parseInt(userid) === 0) return false // zero address
@@ -38,7 +42,8 @@ module.exports = (config,{x2100,users,messages,threads})=>{
 
       },
       async sendMessage(tokenid,message,hint,threshold=defaultThreshold,type=null){
-        assert(await x2100.public.call('isOwner',user.id,tokenid),'You are not the token owner')
+        assert(await query.isOwner(user.id,tokenid),'You are not the token owner')
+        // assert(await x2100.public.call('isOwner',user.id,tokenid),'You are not the token owner')
         assert(bn(threshold).gt(0), 'You must set a threshold greater than zero')
 
         // get follower ids; this excludes the owner
@@ -95,7 +100,8 @@ module.exports = (config,{x2100,users,messages,threads})=>{
         const message = await messages.get(messageid)
         let myHolding = "0"
         try {
-          myHolding = await x2100.public.call('userHolding',user.id,message.tokenid)
+          // myHolding = await x2100.public.call('userHolding',user.id,message.tokenid)
+          myHolding = await query.userHolding(user.id,message.tokenid)
         } catch(e){
           console.log('2100 error', e)
         }
@@ -117,8 +123,8 @@ module.exports = (config,{x2100,users,messages,threads})=>{
         return hideMessage(message)
       },
       async getTokenFeed(tokenid,start,end){
-        const myHolding = await x2100.public.call('userHolding',user.id,tokenid)
-        const ownerAddress = await x2100.public.call('getTokenOwner',tokenid)
+        const myHolding = await query.userHolding(user.id,tokenid)
+        const ownerAddress = await query.getTokenOwner(tokenid)
         const list = await threads.between(tokenid,start,end)
         const isOwner = ownerAddress.toLowerCase() === user.id.toLowerCase()
         return Promise.all(list.map(async thread=>{
