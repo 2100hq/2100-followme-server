@@ -26,7 +26,7 @@ module.exports = async (config, libs) => {
   function tokenHolders(tokenid){
     assert(tokenid,'requires tokenid')
     const state = libs.x2100State.public
-    console.log(state)
+    // console.log(state)
     return state.stats.earned.latest[tokenid] || {}
   }
   function userHolding(userid,tokenid){

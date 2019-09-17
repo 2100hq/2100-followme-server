@@ -2,7 +2,8 @@ const Client = require('2100-server/libs/socket/client')
 const Socket = require('./socket')
 const test = require('tape')
 
-const host = 'ws://localhost:9314'
+// const host = 'ws://localhost:9314'
+const host='ws://socket.staging.2100.co'
 test('2100 client',t=>{
   // t.test('2100 socket',t=>{
     // let socket
@@ -34,6 +35,13 @@ test('2100 client',t=>{
       const publicState = await client.public.call('state')
       console.log('public',state.public.stats.earned.latest)
       t.end()
+    })
+    t.test('log state',t=>{
+      setInterval(x=>{
+        console.log(state.public.stakes)
+        console.log(state.public.stats.global)
+        console.log(state.public.stats.earned)
+      },1000)
     })
   })
 })
