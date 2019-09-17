@@ -23,11 +23,12 @@ module.exports = async (config, libs) => {
     if(!token) return null
     return token.ownerAddress.toLowerCase()
   }
-  function tokenHolders(tokenid){
+  function tokenHolders(tokenid,ignore=[]){
     assert(tokenid,'requires tokenid')
     const state = libs.x2100State.public
-    // console.log(state)
-    return state.stats.earned.latest[tokenid] || {}
+    const earned = lodash.cloneDeep(lodash.get(state,`stats.earned.latest.${tokenid}`,{}))
+    ignore.forEach(id=>lodash.unset(earned,id.toLowerCase()))
+    return earned
   }
   function userHolding(userid,tokenid){
     assert(userid,'requires userid')

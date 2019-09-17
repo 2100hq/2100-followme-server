@@ -27,9 +27,8 @@ module.exports = (config,{x2100,users,messages,threads,query})=>{
       },
       async followers(tokenid,threshold=defaultThreshold){
         assert(await query.isOwner(user.id,tokenid),'You are not the token owner')
-        const followers = await query.tokenHolders(tokenid)
-        // assert(await x2100.public.call('isOwner',user.id,tokenid),'You are not the token owner')
-        // const followers = await x2100.public.call('tokenHolders',tokenid)
+        //this gets followers but ignores tokenid and user.id
+        const followers = await query.tokenHolders(tokenid,[tokenid,user.id])
 
         return Object.entries(followers).filter(([userid,amount])=>{
           if (parseInt(userid) === 0) return false // zero address
@@ -79,7 +78,7 @@ module.exports = (config,{x2100,users,messages,threads,query})=>{
               return threads.create({threadid,messageid:message.id})
             })
           )
-          console.log('delivered all',message.id)
+          // console.log('delivered all',message.id)
         })
 
 
@@ -102,7 +101,6 @@ module.exports = (config,{x2100,users,messages,threads,query})=>{
         const message = await messages.get(messageid)
         let myHolding = "0"
         try {
-          // myHolding = await x2100.public.call('userHolding',user.id,message.tokenid)
           myHolding = await query.userHolding(user.id,message.tokenid)
         } catch(e){
           console.log('2100 error', e)
