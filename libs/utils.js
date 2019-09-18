@@ -50,6 +50,7 @@ exports.hideMessage = message => {
     shortid: message.shortid,
     userid:message.userid,
     created:message.created,
+    message: message.message.replace(/\S/g,'x'),
     length:message.message.length,
     threshold:message.threshold,
     tokenid:message.tokenid,
