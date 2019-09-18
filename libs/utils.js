@@ -47,6 +47,7 @@ exports.ethToWei = eth => {
 exports.hideMessage = message => {
   return {
     id:message.id,
+    shortid: message.shortid,
     userid:message.userid,
     created:message.created,
     message: message.message.replace(/\S/g,'x'),
