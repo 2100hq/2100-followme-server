@@ -139,7 +139,13 @@ module.exports = (config,{x2100,users,messages,threads,query})=>{
         const message = await messages.get(messageid)
         assert(message.userid.toLowerCase() === user.id.toLowerCase(), 'You do not have permission to destroy this message')
         await Promise.all([messages.destroy(messageid), threads.destroyByMessageid(messageid)])
-      }
+      },
+      async unreadNotifications(){
+        return libs.notifications.userRead(user.id)
+      },
+      async setNotificationRead(notificationid){
+        return libs.notifications.read(notificationid)
+      },
     }
     return actions
   }

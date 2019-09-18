@@ -2,8 +2,8 @@ module.exports = (config,libs,emit=x=>x)=>{
 
   function write([table,method,data]){
     switch(table){
-      'threads'
-      'messages'
+      case 'notifications':
+        return emit('private',['notifications',data.id],data,data.userid)
     }
 
   }
