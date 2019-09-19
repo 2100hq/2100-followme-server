@@ -47,6 +47,7 @@ exports.ethToWei = eth => {
 exports.hideMessage = message => {
   return {
     id:message.id,
+    shortid: message.shortid,
     userid:message.userid,
     created:message.created,
     message: message.message.replace(/\S/g,'x'),
@@ -94,6 +95,7 @@ exports.getLinkMetadata = async message => {
 
 exports.getMessageType = messagedoc => {
   if (/meme/i.test(messagedoc.type)) return messagedoc.type
+  if (/gift/i.test(messagedoc.type)) return messagedoc.type
   let type
   let { linkMetadata, message } = messagedoc
 
