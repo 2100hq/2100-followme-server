@@ -24,11 +24,11 @@ module.exports = async (config)=>{
   libs.x2100 = await x2100({host:config[2100].host,channels:['auth','stats','public']},libs.x2100State,(...args)=>events.emit('2100',args))
   await libs.x2100.auth.call('joinStats')
 
-  events.on('2100',(channel,state)=>{
-    if(channel === 'stats'){
-      console.log(state.stats.earned)
-    }
-  })
+  // events.on('2100',(channel,state)=>{
+    // if(channel === 'stats'){
+    //   console.log(state.stats.earned)
+    // }
+  // })
 
   //wait for state to come in
   await libs.x2100.public.call('state')
@@ -77,7 +77,7 @@ module.exports = async (config)=>{
   libs.socket = await Socket(config.socket,libs)
 
   events.on('socket',([channel,path,data,userid])=>{
-    console.log({channel,path,data,userid})
+    // console.log({channel,path,data,userid})
     libs.socket[channel](path,data,userid)
   })
 
