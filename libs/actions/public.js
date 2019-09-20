@@ -13,7 +13,7 @@ module.exports = (config,{threads,messages}) => {
         return args
       },
       async getTokenFeed(tokenid,start,end){
-        const list = await threads.between(tokenid,start,end)
+        const list = await threads.byThread(tokenid,start,end)
         return Promise.map(list,async thread=>{
           const message = await messages.get(thread.messageid)
           return hideMessage(message)
@@ -35,7 +35,7 @@ module.exports = (config,{threads,messages}) => {
       //     .toPromise(Promise)
       // }
       async feed(start,end){
-        const list = await threads.between(publicFeedId,start,end)
+        const list = await threads.byThread(publicFeedId,start,end)
         return Promise.map(list,async x=>{
           const message = await messages.get(x.messageid)
           return hideMessage(message)

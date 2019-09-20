@@ -102,7 +102,7 @@ module.exports = (config,{x2100,users,messages,threads,query})=>{
       //     .toPromise(Promise)
       // },
       async getMyInbox(start=0,end=Date.now()){
-        const list = await threads.between(user.id,start,end)
+        const list = await threads.byThread(user.id,start,end)
         const inbox = await Promise.all(list.map(thread=>{
             try {
               return messages.get(thread.messageid)
@@ -152,7 +152,7 @@ module.exports = (config,{x2100,users,messages,threads,query})=>{
       async getTokenFeed(tokenid,start,end){
         const myHolding = await query.userHolding(user.id,tokenid)
         const ownerAddress = await query.getTokenOwner(tokenid)
-        const list = await threads.between(tokenid,start,end)
+        const list = await threads.byThread(tokenid,start,end)
         const isOwner = ownerAddress.toLowerCase() === user.id.toLowerCase()
         return Promise.all(list.map(async thread=>{
             const message = await messages.get(thread.messageid)
