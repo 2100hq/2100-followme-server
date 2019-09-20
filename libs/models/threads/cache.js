@@ -6,6 +6,7 @@ module.exports = (config, table, emit=x=>x) =>{
     threads.forEach(thread=>{
       obj[thread.id] = thread
     })
+    cache.set(id,obj)
     return threads
   }
 
@@ -24,7 +25,7 @@ module.exports = (config, table, emit=x=>x) =>{
     ...table,
     async set(id,data){
       await table.set(id,data)
-      insertMany(id,[data])
+      insertMany(data.threadid,[data])
       return data
     },
     byThread,
