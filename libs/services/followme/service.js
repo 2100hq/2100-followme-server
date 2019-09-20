@@ -17,7 +17,8 @@ module.exports = async (config)=>{
 
 
   libs.x2100State = {}
-  libs.x2100 = await x2100({host:config[2100].host,channels:['auth','public']},libs.x2100State)
+  libs.x2100 = await x2100({host:config[2100].host,channels:['auth','stats','public']},libs.x2100State)
+  await libs.x2100.auth.call('joinStats')
 
   // libs.joins = await Joins(config,libs)
   libs.query = await Query(config,libs)
@@ -26,6 +27,7 @@ module.exports = async (config)=>{
     private:Actions('private',config,libs),
     auth:Actions('auth',config,libs),
   }
+
 
   libs.authenticate = async function(tokenid){
     // console.log('tokenid',tokenid)
