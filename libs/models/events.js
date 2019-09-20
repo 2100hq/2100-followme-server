@@ -12,7 +12,6 @@ module.exports = (config,libs,emit=x=>x)=>{
         emit('public',['feed',data.messageid],hidden)
       }
     }
-
   }
 
   return {

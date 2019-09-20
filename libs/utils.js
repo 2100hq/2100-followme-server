@@ -57,8 +57,8 @@ exports.hideMessage = message => {
     hint:message.hint,
     hidden:true,
     type: exports.getMessageType(message),
-    recipientCount: message.recipientCount,
-    recipients: message.recipients
+    recipientCount: message.recipientCount || 0,
+    recipients: message.recipients || [],
   }
 }
 

@@ -22,6 +22,7 @@ module.exports = async (config, con) => {
   return {
     ...table,
     userRead(userid,read=false){
+      assert(userid,'requires userid')
       return table.getBy('userRead',[userid,read])
     },
     set(id,props){

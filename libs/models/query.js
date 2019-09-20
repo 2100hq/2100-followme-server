@@ -2,11 +2,12 @@ const lodash = require('lodash')
 const moment = require('moment')
 const Promise = require('bluebird')
 const assert = require('assert')
-const { hideMessage,showMessage } = require('../../utils')
+const { hideMessage,showMessage } = require('../utils')
 
 module.exports = async (config, libs) => {
 
-  const {threads,messages,users,x2100} = libs
+  const {threads,messages,users,x2100,notifications} = libs
+  const {publicFeedId} = config
 
   function ownedTokens(userid){
     assert(userid,'requires userid')
@@ -44,13 +45,15 @@ module.exports = async (config, libs) => {
     return token[userid] || '0'
   }
 
-  function getHiddenFeed(start,end){
-    const list = await threads.between(publicFeedId,start,end)
-    const ms = await messages.getAll(list.map(x=>x.messageid))
-    return ms.map(hideMessage)
+  async function getHiddenFeed(start,end){
+    const list = await threads.byThread(publicFeedId)
+    return Promise.all(list.map(async thread=>{
+      const message = await messages.get(thread.messageid)
+      return hideMessage(message)
+    }))
   }
 
-  function tokenFollowers(tokenid,threshold){
+  async function tokenFollowers(tokenid,threshold){
     const followers = await tokenHolders(tokenid,[tokenid,user.id])
 
     return Object.entries(followers).filter(([userid,amount])=>{
@@ -86,11 +89,19 @@ module.exports = async (config, libs) => {
     })
   }
 
-  async function privateState(userid){
+  async function userNotifications(userid,read=false){
+    return notifications.userRead(userid,read)
   }
+
+  async function privateState(userid){
+    return {
+      notifications: lodash.keyBy(await userNotifications(userid),'id')
+    }
+  }
+
   async function publicState(){
     return {
-      feed: lodash.keyBy(await publicFeed(moment().subtract(1,'day').toValue(),Date.now()),'id')
+      feed: lodash.keyBy(await getHiddenFeed(),'id')
     }
   }
 
@@ -100,6 +111,9 @@ module.exports = async (config, libs) => {
     isOwner,
     ownedTokens,
     getTokenOwner,
+    publicState,
+    privateState,
+    getHiddenFeed,
   }
 
   // async function getPublicFeed(){
