@@ -25,15 +25,23 @@ module.exports = async (config, con) => {
     destroyByMessageid(messageid){
       return table.run(table.table().filter({messageid}).delete())
     },
+    byThread(threadid){
+      return table.getBy('threadid',threadid)
+    },
     between(threadid,start=0,end=Date.now()){
       const query = table.table()
         .between([threadid,start].join('!'),[threadid,end].join('!'),{rightBound:'open',leftBound:'open'})
-        .orderBy({index:'id'})
+        // .orderBy({index:'id'})
         .coerceTo('array')
       // for some reason stream will not return in order
       // return table.readStream(query)
       return table.run(query)
     },
+    betweenStream(threadid,start=0,end=Date.now()){
+      const query = table.table()
+        .between([threadid,start].join('!'),[threadid,end].join('!'),{rightBound:'open',leftBound:'open'})
+      return table.streamify(query)
+    }
   }
 }
 

@@ -2,6 +2,8 @@ const assert = require('assert')
 const lodash = require('lodash')
 const bn = require('bignumber.js')
 const { hideMessage, shortId, getLinkMetadata, showMessage } = require('../utils')
+const Promise = require('bluebird')
+const highland = require('highland')
 
 
 module.exports = (config,{x2100,users,messages,threads,query})=>{
@@ -84,8 +86,23 @@ module.exports = (config,{x2100,users,messages,threads,query})=>{
 
         return showMessage(message)
       },
+      // async getMyInbox(start=0,end=Date.now()){
+      //   return threads.betweenStream(user.id,start,end)
+      //     .map(async thread=>{
+      //       try {
+      //         const message = await messages.get(thread.messageid)
+      //         return showMessage(message)
+      //       } catch(e){
+      //         console.log('getMyInboxError',thread.messageid,e.message)
+      //       }
+      //     })
+      //     .flatMap(highland)
+      //     .compact()
+      //     .collect()
+      //     .toPromise(Promise)
+      // },
       async getMyInbox(start=0,end=Date.now()){
-        const list = await threads.between(user.id,start,end)
+        const list = await threads.byThread(user.id,start,end)
         const inbox = await Promise.all(list.map(thread=>{
             try {
               return messages.get(thread.messageid)
@@ -97,6 +114,16 @@ module.exports = (config,{x2100,users,messages,threads,query})=>{
         )
         return inbox.map(showMessage)
       },
+      // async getMyInbox(start=0,end=Date.now()){
+      //   const list = await threads.between(user.id,start,end)
+      //   return Promise.map(list,async thread=>{
+      //       try {
+      //         return showMessage(await messages.get(thread.messageid))
+      //       } catch(e){
+      //         console.log(thread.messageid)
+      //       }
+      //   })
+      // },
       async getMessage(messageid){
         const message = await messages.get(messageid)
         let myHolding = "0"
@@ -125,7 +152,7 @@ module.exports = (config,{x2100,users,messages,threads,query})=>{
       async getTokenFeed(tokenid,start,end){
         const myHolding = await query.userHolding(user.id,tokenid)
         const ownerAddress = await query.getTokenOwner(tokenid)
-        const list = await threads.between(tokenid,start,end)
+        const list = await threads.byThread(tokenid,start,end)
         const isOwner = ownerAddress.toLowerCase() === user.id.toLowerCase()
         return Promise.all(list.map(async thread=>{
             const message = await messages.get(thread.messageid)
