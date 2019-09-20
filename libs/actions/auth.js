@@ -11,7 +11,6 @@ module.exports = (config,libs,emit=x=>x)=>{
           res()
         }))
         const state = await libs.query.privateState(userid)
-        console.log(state)
         socket.emit('private',[[[],state]])
         return userid
       }
