@@ -60,8 +60,10 @@ module.exports = async (config, libs) => {
       }
       isHidden = !isOwner && !isAuthor && bn(myHolding).isLessThan(message.threshold)
     }
+
     const outputFn = isHidden ? hideMessage : showMessage
 
+    // IF VISIBLE
     if (!isHidden){
       // This is a visible reply; do not deliver to user's inbox
       if (!message.parentid){
@@ -74,6 +76,7 @@ module.exports = async (config, libs) => {
 
       message.recipients = message.recipients || []
 
+      // If user hasn't seen this before, update the message
       if (!message.recipients.includes(userid)){
         message.recipientcount = (message.recipientcount || 0)+1
         message.recipients.push(userid)
