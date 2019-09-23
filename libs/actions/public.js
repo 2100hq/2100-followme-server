@@ -2,7 +2,7 @@ const assert = require('assert')
 const highland = require('highland')
 const Promise = require('bluebird')
 const { hideMessage } = require('../utils')
-module.exports = (config,{threads,messages}) => {
+module.exports = (config,{threads,messages, query}) => {
   const {publicFeedId} = config
   assert(threads,'requires threads')
   assert(messages,'requires messages')
@@ -21,8 +21,7 @@ module.exports = (config,{threads,messages}) => {
       },
       async getMessage(messageid){
         console.log('public getMessage', messageid)
-        const message = await messages.get(messageid)
-        return hideMessage(message)
+        return query.getMessage(messageid)
       },
       // async feed(start,end){
       //   return threads.betweenStream(publicFeedId,start,end)
