@@ -46,7 +46,7 @@ exports.ethToWei = eth => {
 
 exports.hideMessage = message => {
   console.log('hiding message', message)
-  const newmessage= {
+  const newmessage = {
     id:message.id,
     shortid: message.shortid,
     userid:message.userid,

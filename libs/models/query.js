@@ -1,7 +1,7 @@
 const lodash = require('lodash')
 const Promise = require('bluebird')
 const assert = require('assert')
-const { hideMessage } = require('../utils')
+const { hideMessage, showMessage } = require('../utils')
 
 module.exports = async (config, libs) => {
   const {threads,messages} = libs
@@ -46,13 +46,15 @@ module.exports = async (config, libs) => {
     console.log();
     console.log('>GETMESSAGE', message);
     let isHidden = true
+    let _isOwner = false
+    let isAuthor = false
 
     if (userid){
-      const isOwner = await isOwner(userid,message.tokenid)
-      const isAuthor = userid === message.userid
+      _isOwner = await isOwner(userid,message.tokenid)
+      isAuthor = userid === message.userid
       let myHolding = "0"
       try {
-        if (!isOwner && !isAuthor){
+        if (!_isOwner && !isAuthor){
           myHolding = await userHolding(userid,message.tokenid)
         }
       } catch(e){
@@ -77,7 +79,7 @@ module.exports = async (config, libs) => {
       message.recipients = message.recipients || []
 
       // If user hasn't seen this before, update the message
-      if (!message.recipients.includes(userid)){
+      if (!_isOwner && !isAuthor && !message.recipients.includes(userid)){
         message.recipientcount = (message.recipientcount || 0)+1
         message.recipients.push(userid)
         messages.set(message) // updates in the background

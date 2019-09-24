@@ -98,7 +98,7 @@ module.exports = (config,{x2100,users,messages,threads,query})=>{
           console.log('before parentmessage', parentmessage);
           console.log();
 
-          parentmessage.childcount = (parentmessage.childcount || 0)+1
+          parentmessage.childCount = (parentmessage.childCount || 0)+1
           await messages.set(parentmessage)
           console.log('after parentmessage', parentmessage);
           console.log();
