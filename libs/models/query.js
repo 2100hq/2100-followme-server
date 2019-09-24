@@ -43,8 +43,7 @@ module.exports = async (config, libs) => {
 
   async function getMessage(messageid, userid){
     const message = await messages.get(messageid)
-    console.log();
-    console.log('>GETMESSAGE', message);
+
     let isHidden = true
     let _isOwner = false
     let isAuthor = false
@@ -88,7 +87,6 @@ module.exports = async (config, libs) => {
 
     // if you can see this message, you can see its parent
     if (message.parentid){
-      console.log('getting parent', message)
       try {
         message.parent = await getMessage(message.parentid, user)
       } catch(e){

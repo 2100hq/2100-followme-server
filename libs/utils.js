@@ -45,7 +45,6 @@ exports.ethToWei = eth => {
 }
 
 exports.hideMessage = message => {
-  console.log('hiding message', message)
   const newmessage = {
     id:message.id,
     shortid: message.shortid,
@@ -65,22 +64,17 @@ exports.hideMessage = message => {
     parent: message.parent && exports.hideMessage(message.parent),
     children: message.children && message.children.map(exports.hideMessage)
   }
-  console.log();
-  console.log('> OUTPUT',newmessage);
 
   return newmessage
 }
 
 exports.showMessage = message => {
-  console.log('showing message', message)
   const type = exports.getMessageType(message)
   const link = exports.getLink(message)
   const {linkMetadata, ...visible} = message
   // parent is already truncted in the private/getMessage
   const children = message.children ? message.children.map(exports.showMessage) : message.parentid ? undefined : []
   const newmessage = {...visible, children, type, link}
-  console.log();
-  console.log('> OUTPUT',newmessage);
 
   return newmessage
 
