@@ -61,8 +61,8 @@ exports.hideMessage = message => {
     recipients: message.recipients,
     parentid: message.parentid,
     childCount: message.childCount||0,
-    parent: message.parent && exports.hideMessage(message.parent),
-    children: message.children && message.children.map(exports.hideMessage)
+    parent: message.parent,
+    children: message.children || []
   }
 
   return newmessage
@@ -73,8 +73,9 @@ exports.showMessage = message => {
   const link = exports.getLink(message)
   const {linkMetadata, ...visible} = message
   // parent is already truncted in the private/getMessage
-  const children = message.children ? message.children.map(exports.showMessage) : message.parentid ? undefined : []
-  const newmessage = {...visible, children, type, link}
+  const children = message.children || []
+  const childCount = message.childCount || 0
+  const newmessage = {...visible, children, childCount, type, link}
 
   return newmessage
 

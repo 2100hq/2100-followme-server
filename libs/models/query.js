@@ -2,6 +2,7 @@ const lodash = require('lodash')
 const Promise = require('bluebird')
 const assert = require('assert')
 const { hideMessage, showMessage } = require('../utils')
+const bn = require('bignumber.js')
 
 module.exports = async (config, libs) => {
   const {threads,messages} = libs
@@ -41,13 +42,17 @@ module.exports = async (config, libs) => {
     return token[userid] || '0'
   }
 
-  async function getMessage(messageid, userid){
+  async function getMessage(messageid, userid, gotMessages = []){
+    gotMessages.push(messageid) // this prevents infinite recursion; ids retreived are pushed to this object
+
     const message = await messages.get(messageid)
 
     let isHidden = true
     let _isOwner = false
     let isAuthor = false
+    let isReply = message.parentid != null
 
+    // if user is logged in
     if (userid){
       _isOwner = await isOwner(userid,message.tokenid)
       isAuthor = userid === message.userid
@@ -59,15 +64,15 @@ module.exports = async (config, libs) => {
       } catch(e){
         console.log('2100 error', e)
       }
-      isHidden = !isOwner && !isAuthor && bn(myHolding).isLessThan(message.threshold)
+      isHidden = !_isOwner && !isAuthor && bn(myHolding).isLessThan(message.threshold)
     }
 
     const outputFn = isHidden ? hideMessage : showMessage
 
-    // IF VISIBLE
-    if (!isHidden){
-      // This is a visible reply; do not deliver to user's inbox
-      if (!message.parentid){
+    // If this message is visible and author isn't retrieving the message
+    if (!isHidden && !isAuthor){
+      // If this is not a reply
+      if (!isReply){
         // in the background, publish this message to user's inbox so they dont have to decode again
         threads.getByThreadIdMessageId(userid, message.id).then( async result => {
           if (result.length > 0) return
@@ -77,27 +82,35 @@ module.exports = async (config, libs) => {
 
       message.recipients = message.recipients || []
 
-      // If user hasn't seen this before, update the message
-      if (!_isOwner && !isAuthor && !message.recipients.includes(userid)){
+      // If user previously hasnt 'received' it
+      if (!message.recipients.includes(userid)){
         message.recipientcount = (message.recipientcount || 0)+1
         message.recipients.push(userid)
         messages.set(message) // updates in the background
       }
     }
 
-    // if you can see this message, you can see its parent
-    if (message.parentid){
+    if (isReply){
+      // if you can see this message, you can see its parent
       try {
-        message.parent = await getMessage(message.parentid, user)
+        const id = message.parentid
+        if (!gotMessages.includes(id)) message.parent = await getMessage(id, user, gotMessages)
       } catch(e){
         message.parent = null
       }
-    } else {
+    }
+
+    if (!isReply) {
       // if you can see this message, you can see its children
-      const children = await Promise.all((await threads.byThread(message.id)).map( async thread => {
+      const children = await Promise.all((await threads.byThread(message.id)).map(thread => {
+          // might throw if message has been deleted
           try {
-            return await messages.get(thread.messageid)
+            const id = thread.messageid
+            if (gotMessages.includes(id)) return null
+            return getMessage(id, userid, gotMessages)
           } catch(e){
+            console.log('getting child messages for', messageid)
+            console.log(e)
             return null
           }
         })
