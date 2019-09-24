@@ -97,13 +97,8 @@ module.exports = (config,{x2100,users,messages,threads,query})=>{
           if (!parentid) return
           // add this child message to the set of replies
           parentmessage = await messages.get(parentid)
-          console.log('before parentmessage', parentmessage);
-          console.log();
-
           parentmessage.childCount = (parentmessage.childCount || 0)+1
           await messages.set(parentmessage)
-          console.log('after parentmessage', parentmessage);
-          console.log();
         })
 
 
