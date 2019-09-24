@@ -43,8 +43,9 @@ module.exports = (config,{x2100,users,messages,threads,query})=>{
 
       },
 
-      async sendMessage({tokenid,message,hint,threshold=defaultThreshold,type=null,parentid=null}){
+      async sendMessage({tokenid,message,hint=null,threshold=defaultThreshold,type=null,parentid=null}){
         let parentmessage
+
         // `parentid` signfiies this is a reply
         if (!parentid){
           assert(await query.isOwner(user.id,tokenid),'You are not the token owner')
@@ -56,6 +57,7 @@ module.exports = (config,{x2100,users,messages,threads,query})=>{
           threshold = parentmessage.threshold
           assert(!parentmessage.hidden, 'You need to decode the original message first before commenting')
           assert(!parentmessage.parentid, 'You cannot reply to a reply')
+          hint = null // makes sure there's no hint for replies
         }
 
         const recipientIds = [] // don't deliver to any followers
