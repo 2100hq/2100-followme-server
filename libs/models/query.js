@@ -106,6 +106,7 @@ module.exports = async (config, libs) => {
     return {
       feed: lodash.keyBy(await getHiddenFeed(),'id')
     }
+  }
 
   async function getMessage(messageid, userid, gotMessages = []){
     gotMessages.push(messageid) // this prevents infinite recursion; ids retreived are pushed to this object
