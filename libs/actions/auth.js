@@ -1,4 +1,5 @@
 const uuid = require('uuid/v4')
+const assert = require('assert')
 module.exports = (config,libs,emit=x=>x)=>{
   return (socket)=>{
     return {
