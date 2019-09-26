@@ -45,7 +45,7 @@ exports.ethToWei = eth => {
 }
 
 exports.hideMessage = message => {
-  return {
+  const newmessage = {
     id:message.id,
     shortid: message.shortid,
     userid:message.userid,
@@ -57,16 +57,28 @@ exports.hideMessage = message => {
     hint:message.hint,
     hidden:true,
     type: exports.getMessageType(message),
-    recipientCount: message.recipientCount || 0,
-    recipients: message.recipients || [],
+    recipientCount: message.recipientCount,
+    recipients: message.recipients,
+    parentid: message.parentid,
+    childCount: message.childCount||0,
+    parent: message.parent,
+    children: message.children || []
   }
+
+  return newmessage
 }
 
 exports.showMessage = message => {
   const type = exports.getMessageType(message)
   const link = exports.getLink(message)
   const {linkMetadata, ...visible} = message
-  return {...visible, type, link}
+  // parent is already truncted in the private/getMessage
+  const children = message.children || []
+  const childCount = message.childCount || 0
+  const newmessage = {...visible, children, childCount, type, link}
+
+  return newmessage
+
 }
 
 exports.shortId = length => shortlink.generate(length)

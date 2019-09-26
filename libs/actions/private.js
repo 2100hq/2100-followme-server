@@ -42,13 +42,23 @@ module.exports = (config,{x2100,users,messages,threads,query})=>{
         }, {})
 
       },
-      async sendMessage(tokenid,message,hint,threshold=defaultThreshold,type=null){
-        assert(await query.isOwner(user.id,tokenid),'You are not the token owner')
-        // assert(await x2100.public.call('isOwner',user.id,tokenid),'You are not the token owner')
-        assert(bn(threshold).gt(0), 'You must set a threshold greater than zero')
 
-        // get follower ids; this excludes the owner
-        // const recipientIds = [] Object.keys(await actions.followers(tokenid, threshold))
+      async sendMessage({tokenid,message,hint=null,threshold=defaultThreshold,type=null,parentid=null}){
+        let parentmessage
+
+        // `parentid` signfiies this is a reply
+        if (!parentid){
+          assert(await query.isOwner(user.id,tokenid),'You are not the token owner')
+          assert(bn(threshold).gt(0), 'You must set a threshold greater than zero')
+        } else {
+          parentmessage = await actions.getMessage(parentid)
+          console.log('retrieved parentmessage', parentmessage)
+          tokenid = parentmessage.tokenid
+          threshold = parentmessage.threshold
+          assert(!parentmessage.hidden, 'You need to decode the original message first before commenting')
+          assert(!parentmessage.parentid, 'You cannot reply to a reply')
+          hint = null // makes sure there's no hint for replies
+        }
 
         const recipientIds = [] // don't deliver to any followers
 
@@ -64,23 +74,31 @@ module.exports = (config,{x2100,users,messages,threads,query})=>{
           recipients: [...recipientIds],
           recipientcount: recipientIds.length,
           type,
+          parentid,
           linkMetadata
         })
 
-        //add owner to recipients
-        recipientIds.unshift(user.id)
-        //add token feed to recipients
-        recipientIds.unshift(tokenid)
-        //add anonymized public feed to recipients
-
-        recipientIds.unshift(publicFeedId)
-
+        if (parentid){
+          // only recipient is the parent message
+          recipientIds.unshift(parentid)
+        } else {
+          //add owner to recipients
+          recipientIds.unshift(user.id)
+          //add token feed to recipients
+          recipientIds.unshift(tokenid)
+          //add anonymized public feed to recipients
+          recipientIds.unshift(publicFeedId)
+        }
         setImmediate(async () => {
           await Promise.all(recipientIds.map(threadid=>{
               return threads.create({threadid,messageid:message.id})
             })
           )
-          // console.log('delivered all',message.id)
+          if (!parentid) return
+          // add this child message to the set of replies
+          parentmessage = await messages.get(parentid)
+          parentmessage.childCount = (parentmessage.childCount || 0)+1
+          await messages.set(parentmessage)
         })
 
 
@@ -125,29 +143,7 @@ module.exports = (config,{x2100,users,messages,threads,query})=>{
       //   })
       // },
       async getMessage(messageid){
-        const message = await messages.get(messageid)
-        let myHolding = "0"
-        try {
-          myHolding = await query.userHolding(user.id,message.tokenid)
-        } catch(e){
-          console.log('2100 error', e)
-        }
-
-        if(bn(myHolding).isGreaterThanOrEqualTo(message.threshold)) {
-
-          // in the background, publish this message to user's inbox so they dont have to decode again
-          threads.getByThreadIdMessageId(user.id, message.id).then( async result => {
-            if (result.length > 0) return
-            await threads.create({created: message.created, threadid: user.id,messageid:message.id})
-            message.recipientcount = message.recipientcount+1
-            message.recipients.push(user.id)
-            await messages.set(message)
-          })
-
-          return showMessage(message)
-        }
-
-        return hideMessage(message)
+        return query.getMessage(messageid,user.id)
       },
       async getTokenFeed(tokenid,start,end){
         const myHolding = await query.userHolding(user.id,tokenid)
