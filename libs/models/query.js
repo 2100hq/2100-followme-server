@@ -46,6 +46,31 @@ module.exports = async (config, libs) => {
     return token[userid] || '0'
   }
 
+  async function messagesByHour(hour,threadid,userid){
+    const thread = await threads.byHour(hour.toString(),threadid)
+    return Promise.map(thread,thread=>{
+      return getMessage(thread.messageid,userid)
+    })
+  }
+
+  async function mixFeedByHour(hour,threadids=[],userid){
+    const messages = await Promise.map(threadids,threadid=>{
+      return messagesByHour(hour,threadid,userid)
+    })
+
+
+    const result =  messages.reduce((result,messages)=>{
+      messages.forEach(message=>{
+        if(result[message.id] == null) {
+          result[message.id] = message
+        }
+      })
+      return result
+    },{})
+
+    return Object.values(result)
+  }
+
   async function getMessage(messageid, userid, gotMessages = []){
     gotMessages.push(messageid) // this prevents infinite recursion; ids retreived are pushed to this object
 
@@ -132,7 +157,9 @@ module.exports = async (config, libs) => {
     isOwner,
     ownedTokens,
     getTokenOwner,
-    getMessage
+    getMessage,
+    messagesByHour,
+    mixFeedByHour,
   }
 
   // async function getPublicFeed(){

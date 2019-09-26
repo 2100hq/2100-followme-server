@@ -162,6 +162,12 @@ module.exports = (config,{x2100,users,messages,threads,query})=>{
         const message = await messages.get(messageid)
         assert(message.userid.toLowerCase() === user.id.toLowerCase(), 'You do not have permission to destroy this message')
         await Promise.all([messages.destroy(messageid), threads.destroyByMessageid(messageid)])
+      },
+      async inboxByHour(hour){
+        return query.messagesByHour(hour,user.id)
+      },
+      async feedByHour(hour){
+        return query.mixFeedByHour(hour,[publicFeedId,user.id],user.id)
       }
     }
     return actions

@@ -39,6 +39,9 @@ module.exports = (config,{threads,messages, query}) => {
           const message = await messages.get(x.messageid)
           return hideMessage(message)
         })
+      },
+      async feedByHour(hour){
+        return query.messagesByHour(hour,publicFeedId)
       }
     }
   }

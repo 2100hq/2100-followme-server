@@ -100,6 +100,24 @@ test('express',t=>{
     console.log('result',result)
     t.end()
   })
+  t.test('publicByHour',async t=>{
+    const time = '1566223200000'                                                                     
+    const result = await actions.public.call('feedByHour',time)
+    console.log('result',result)
+    t.end()
+  })
+  t.test('inboxByHour',async t=>{
+    const time = '1566223200000'                                                                     
+    const result = await actions.private.call('inboxByHour',time)
+    console.log('result',result)
+    t.end()
+  })
+  t.test('feedByHour',async t=>{
+    const time = '1566223200000'                                                                     
+    const result = await actions.private.call('feedByHour',time)
+    console.log('result',result)
+    t.end()
+  })
 
 
 })

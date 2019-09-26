@@ -8,32 +8,6 @@
   dependencies:
     truffle "^5.0.32"
 
-"2100-fake-server@https://github.com/2100hq/2100-server.git":
-  version "1.0.0"
-  resolved "https://github.com/2100hq/2100-server.git#d1cccaa268db92c56f55213606300e9eb5bc285e"
-  dependencies:
-    "2100-contracts" "github:2100hq/2100-contracts#v0.2.3"
-    axios "^0.19.0"
-    bignumber.js "^9.0.0"
-    bluebird "^3.5.5"
-    cheerio "^1.0.0-rc.3"
-    dotenv "^8.0.0"
-    ethers "^4.0.33"
-    express "^4.17.1"
-    fastest-validator "^0.6.17"
-    highland "^2.13.4"
-    lodash "^4.17.15"
-    memtable "^2.0.0-alpha.12"
-    moment "^2.24.0"
-    mongodb "^3.3.2"
-    pad "^3.2.0"
-    rethink-table "^0.0.5"
-    rethinkdb "^2.3.3"
-    socket.io "^2.2.0"
-    socket.io-client "^2.2.0"
-    tape "^4.11.0"
-    uuid "^3.3.2"
-
 "2100-server@https://github.com/2100hq/2100-server.git":
   version "1.0.0"
   resolved "https://github.com/2100hq/2100-server.git#4a8e7dc50ec155fa7e2f2da66f8bc50734cbc523"
