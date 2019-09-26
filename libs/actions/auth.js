@@ -2,7 +2,8 @@ const uuid = require('uuid/v4')
 module.exports = (config,libs,emit=x=>x)=>{
   return (socket)=>{
     return {
-      async unauthenticate(tokenid){
+      async unauthenticate(){
+        assert(socket.userid,'you are already logged out')
         await new Promise((res,rej)=>socket.leave(socket.userid,err=>{
           if(err) return rej(err)
           res()
