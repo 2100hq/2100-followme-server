@@ -1,26 +1,29 @@
-const Promise = require('bluebird')
 const bn = require('bignumber.js')
 module.exports = (config,libs,emit)=>{
 
-  async function createNotification(userid,messageid,title,message){
-    const notificationid = [userid,messageid].join('!')
+  async function createNotification(userid,message,type){
+    const notificationid = [userid,message.id].join('!')
     const exists = await libs.notifications.has(notificationid)
     if(exists) return
     return libs.notifications.create({
       id:notificationid,
       userid,
-      messageid,
-      title,
-      message,
+      messageid: message.id,
+      tokenid: message.tokenid,
+      parentid: message.parentid,
+      type
     })
   }
 
   async function tick(message){
-    const tokenHolders = await libs.query.tokenHolders(message.tokenid,[message.id,message.tokenid])
-    return Promise.map(Object.entries(tokenHolders),([userid,amount])=>{
+    const tokenHolders = await libs.query.tokenHolders(message.tokenid,[message.userid,message.tokenid])
+    return Promise.all(Object.entries(tokenHolders).map(([userid,amount])=>{
+      if (message.userid === userid) return
+      if ((message.recipients || []).includes(userid)) return
       if(bn(amount).isLessThan(message.threshold)) return
-      return createNotification(userid,message.id,'Message Available','You can decode a new message')
-    })
+      const type = message.parentid ? 'reply' : 'decodable'
+      return createNotification(userid,message, type)
+    }))
   }
 
   return {
