@@ -33,6 +33,12 @@ test('socket',t=>{
     console.log(result)
     t.end()
   })
+  t.test('unauthenticate',async t=>{
+    const result = await actions.auth.call('unauthenticate')
+    await actions.private.call('me').catch(t.ok)
+    console.log(result)
+    t.end()
+  })
 })
 
 
