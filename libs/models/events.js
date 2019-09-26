@@ -12,7 +12,7 @@ module.exports = (config,libs,emit=x=>x)=>{
         if(data.threadid === publicFeedId){
           const message = await libs.messages.get(data.messageid)
           const hidden = hideMessage(message)
-          emit('public',['feed',data.messageid],hidden)
+          emit('public',['messages',data.messageid],hidden)
         }
       }
     }
