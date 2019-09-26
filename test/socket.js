@@ -20,12 +20,12 @@ test('socket',t=>{
     t.end()
   })
   t.test('authenticate',async t=>{
-    const result = await actions.auth.call('authenticate',config.test.publicAddress)
+    const result = await actions.auth.call('authenticate',config.test.publicAddress).catch(t.end)
     console.log(result)
     t.end()
   })
   t.test('state',async t=>{
-    // console.log(state)
+    console.log(state.private.messages)
     t.end()
   })
   t.test('me',async t=>{

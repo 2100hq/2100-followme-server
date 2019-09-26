@@ -70,7 +70,7 @@ module.exports = async (config, libs) => {
   }
 
   async function userInbox(userid,start,end){
-    const list = await threads.between(user.id,start,end)
+    const list = await threads.byThread(userid)
 
     return Promise.map(list,async thread=>{
       const message = await messages.get(thread.messageid)
