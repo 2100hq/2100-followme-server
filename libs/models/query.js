@@ -98,13 +98,14 @@ module.exports = async (config, libs) => {
 
   async function privateState(userid){
     return {
-      notifications: lodash.keyBy(await userNotifications(userid),'id')
+      notifications: lodash.keyBy(await userNotifications(userid),'id'),
+      messages: lodash.keyBy(await userInbox(userid),'id')
     }
   }
 
   async function publicState(){
     return {
-      feed: lodash.keyBy(await getHiddenFeed(),'id')
+      messages: lodash.keyBy(await getHiddenFeed(),'id')
     }
   }
 
