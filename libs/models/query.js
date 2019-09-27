@@ -112,7 +112,7 @@ module.exports = async (config, libs) => {
   async function getMessage(messageid, userid, gotMessages = []){
     gotMessages.push(messageid) // this prevents infinite recursion; ids retreived are pushed to this object
 
-    const message = await messages.get(messageid)
+    let message = await messages.get(messageid)
 
     let isHidden = true
     let _isOwner = false
@@ -153,9 +153,10 @@ module.exports = async (config, libs) => {
       if (!message.recipients.includes(userid)){
         message.recipientcount = (message.recipientcount || 0)+1
         message.recipients.push(userid)
-        messages.set(message) // updates in the background
+        messages.set({...message}) // updates in the background; clone the object before saving, mutations below
       }
     }
+    message = {...message} // clone the object, mutations below
 
     if (isReply){
       // if you can see this message, you can see its parent
