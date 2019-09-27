@@ -99,6 +99,8 @@ module.exports = (config,{x2100,users,messages,threads,query})=>{
           const parentmessage = await messages.get(parentid)
           parentmessage.childCount = (parentmessage.childCount || 0)+1
           await messages.set(parentmessage)
+          const result = await threads.getByThreadIdMessageId(publicFeedId, parentmessage.id) // update the parent public thread; this sends an event
+          result.forEach( thread => threads.set({...thread, updated: Date.now()}))
         })
 
 
