@@ -44,17 +44,16 @@ module.exports = (config,{x2100,users,messages,threads,query})=>{
       },
 
       async sendMessage({tokenid,message,hint=null,threshold=defaultThreshold,type=null,parentid=null}){
-        let parentmessage
-
         // `parentid` signfiies this is a reply
+        let parentuserid = null
         if (!parentid){
           assert(await query.isOwner(user.id,tokenid),'You are not the token owner')
           assert(bn(threshold).gt(0), 'You must set a threshold greater than zero')
         } else {
-          parentmessage = await actions.getMessage(parentid)
-          console.log('retrieved parentmessage', parentmessage)
+          const parentmessage = await actions.getMessage(parentid)
           tokenid = parentmessage.tokenid
           threshold = parentmessage.threshold
+          parentuserid = parentmessage.userid
           assert(!parentmessage.hidden, 'You need to decode the original message first before commenting')
           assert(!parentmessage.parentid, 'You cannot reply to a reply')
           hint = null // makes sure there's no hint for replies
@@ -75,6 +74,7 @@ module.exports = (config,{x2100,users,messages,threads,query})=>{
           recipientcount: recipientIds.length,
           type,
           parentid,
+          parentuserid,
           linkMetadata
         })
 
@@ -96,7 +96,7 @@ module.exports = (config,{x2100,users,messages,threads,query})=>{
           )
           if (!parentid) return
           // add this child message to the set of replies
-          parentmessage = await messages.get(parentid)
+          const parentmessage = await messages.get(parentid)
           parentmessage.childCount = (parentmessage.childCount || 0)+1
           await messages.set(parentmessage)
         })
