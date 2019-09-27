@@ -34,11 +34,7 @@ module.exports = (config,{threads,messages, query}) => {
       //     .toPromise(Promise)
       // }
       async feed(start,end){
-        const list = await threads.byThread(publicFeedId,start,end)
-        return Promise.map(list,async x=>{
-          const message = await messages.get(x.messageid)
-          return hideMessage(message)
-        })
+        return query.getHiddenFeed(start,end)
       }
     }
   }

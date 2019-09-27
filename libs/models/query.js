@@ -1,11 +1,13 @@
 const lodash = require('lodash')
+const moment = require('moment')
 const Promise = require('bluebird')
 const assert = require('assert')
-const { hideMessage, showMessage } = require('../utils')
+const { hideMessage,showMessage } = require('../utils')
 const bn = require('bignumber.js')
-
 module.exports = async (config, libs) => {
-  const {threads,messages} = libs
+  const {threads,messages,users,x2100,notifications} = libs
+  const {publicFeedId} = config
+
   function ownedTokens(userid){
     assert(userid,'requires userid')
     const state = libs.x2100State.public
@@ -46,10 +48,71 @@ module.exports = async (config, libs) => {
     return token[userid] || '0'
   }
 
+  async function getHiddenFeed(start,end){
+    const list = await threads.byThread(publicFeedId)
+    return Promise.all(list.map(async thread=>{
+      const message = await messages.get(thread.messageid)
+      return hideMessage(message)
+    }))
+  }
+
+  async function tokenFollowers(tokenid,threshold){
+    const followers = await tokenHolders(tokenid,[tokenid,user.id])
+
+    return Object.entries(followers).filter(([userid,amount])=>{
+      if (parseInt(userid) === 0) return false // zero address
+      if (userid.toLowerCase() === user.id.toLowerCase()) return false // exclude the owner from the list of followers
+      return bn(amount).isGreaterThanOrEqualTo(threshold)
+    }).reduce((obj, [userid,amount])=>{
+      obj[userid] = amount
+      return obj
+    }, {})
+  }
+
+  async function userInbox(userid,start,end){
+    const list = await threads.byThread(userid)
+
+    return Promise.map(list,async thread=>{
+      const message = await messages.get(thread.messageid)
+      return showMessage(message)
+    })
+  }
+
+  async function userTokenFeed(userid,tokenid,start,end){
+    const myHolding = await userHolding(userid,tokenid)
+    const ownerAddress = await getTokenOwner(tokenid)
+    const list = await threads.between(tokenid,start,end)
+    const isOwner = ownerAddress.toLowerCase() === userid.toLowerCase()
+
+    return Promise.map(list,async thread=>{
+      const message = await messages.get(thread.messageid)
+      if (isOwner) return showMessage(message)
+      if(bn(myHolding).isGreaterThanOrEqualTo(message.threshold)) return showMessage(message)
+        return hideMessage(message)
+    })
+  }
+
+  async function userNotifications(userid,read=false){
+    return notifications.userRead(userid,read)
+  }
+
+  async function privateState(userid){
+    return {
+      notifications: lodash.keyBy(await userNotifications(userid),'id'),
+      messages: lodash.keyBy(await userInbox(userid),'id')
+    }
+  }
+
+  async function publicState(){
+    return {
+      messages: lodash.keyBy(await getHiddenFeed(),'id')
+    }
+  }
+
   async function getMessage(messageid, userid, gotMessages = []){
     gotMessages.push(messageid) // this prevents infinite recursion; ids retreived are pushed to this object
 
-    const message = await messages.get(messageid)
+    let message = await messages.get(messageid)
 
     let isHidden = true
     let _isOwner = false
@@ -90,9 +153,10 @@ module.exports = async (config, libs) => {
       if (!message.recipients.includes(userid)){
         message.recipientcount = (message.recipientcount || 0)+1
         message.recipients.push(userid)
-        messages.set(message) // updates in the background
+        messages.set({...message}) // updates in the background; clone the object before saving, mutations below
       }
     }
+    message = {...message} // clone the object, mutations below
 
     if (isReply){
       // if you can see this message, you can see its parent
@@ -132,6 +196,9 @@ module.exports = async (config, libs) => {
     isOwner,
     ownedTokens,
     getTokenOwner,
+    publicState,
+    privateState,
+    getHiddenFeed,
     getMessage
   }
 

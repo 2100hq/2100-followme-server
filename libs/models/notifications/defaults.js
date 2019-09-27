@@ -1,11 +1,14 @@
 const uuid = require('uuid/v4')
+const {IncreasingId} = require('../../utils')
 module.exports = config => {
+  const id = IncreasingId()
   return (props={})=> {
     return {
-      id:props.id || uuid(),
+      id:id(Date.now()),
       created:Date.now(),
-      updated:Date.now(),
+      hasRead:false,
       ...props,
+      updated:Date.now(),
     }
   }
 }
