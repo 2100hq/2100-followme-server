@@ -189,8 +189,9 @@ module.exports = async (config, libs) => {
       const recipientTimestamps = await Promise.all((message.recipients||[]).map(async userid => {
           const result = await threads.getByThreadIdMessageId(userid, message.id)
           if (result.length === 0) return null
-          const {created: timestamp} = result[0]
-          return {[userid]: timestamp}
+          const {id} = result[0]
+          const [_, timestamp] = id.split('!') // hack to get the correct timestamp; create is the same for all threads for some reason
+          return {[userid]: timestamp: Number(timestamp)}
         })
       )
 
