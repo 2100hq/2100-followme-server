@@ -141,7 +141,7 @@ module.exports = async (config, libs) => {
       // If this is not a reply
       if (!isReply){
         // in the background, publish this message to user's inbox so they dont have to decode again
-        threads.getByThreadIdMessageId(userid, message.id).then( async result => {
+        await threads.getByThreadIdMessageId(userid, message.id).then( async result => {
           if (result.length > 0) return
           await threads.create({created: message.created, threadid: userid,messageid:message.id})
         })
@@ -153,7 +153,7 @@ module.exports = async (config, libs) => {
       if (!message.recipients.includes(userid)){
         message.recipientcount = (message.recipientcount || 0)+1
         message.recipients.push(userid)
-        messages.set({...message}) // updates in the background; clone the object before saving, mutations below
+        await messages.set({...message}) // updates in the background; clone the object before saving, mutations below
       }
     }
     message = {...message} // clone the object, mutations below
@@ -185,6 +185,16 @@ module.exports = async (config, libs) => {
       )
 
       message.children = children.filter(x=>x)
+
+      const recipientTimestamps = await Promise.all((message.recipients||[]).map( userid => {
+          const result = threads.getByThreadIdMessageId(userid, message.id)
+          if (result.length === 0) return null
+          const {created: timestamp} = result[0]
+          return {[userid]: timestamp}
+        })
+      )
+
+      message.recipientTimestamps = recipientTimestamps.map(x => x)
     }
 
     return outputFn(message)
