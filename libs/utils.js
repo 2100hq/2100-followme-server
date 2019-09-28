@@ -63,7 +63,8 @@ exports.hideMessage = message => {
     parentid: message.parentid,
     childCount: message.childCount||0,
     parent: message.parent,
-    children: message.children || []
+    children: message.children || [],
+    recipientTimestamps: message.recipientTimestamps || [],
   }
 
   return newmessage

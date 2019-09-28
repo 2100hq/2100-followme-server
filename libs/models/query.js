@@ -156,6 +156,7 @@ module.exports = async (config, libs) => {
         await messages.set({...message}) // updates in the background; clone the object before saving, mutations below
       }
     }
+
     message = {...message} // clone the object, mutations below
 
     if (isReply){
