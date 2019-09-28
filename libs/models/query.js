@@ -186,8 +186,8 @@ module.exports = async (config, libs) => {
 
       message.children = children.filter(x=>x)
 
-      const recipientTimestamps = await Promise.all((message.recipients||[]).map( userid => {
-          const result = threads.getByThreadIdMessageId(userid, message.id)
+      const recipientTimestamps = await Promise.all((message.recipients||[]).map(async userid => {
+          const result = await threads.getByThreadIdMessageId(userid, message.id)
           if (result.length === 0) return null
           const {created: timestamp} = result[0]
           return {[userid]: timestamp}
