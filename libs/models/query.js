@@ -191,7 +191,7 @@ module.exports = async (config, libs) => {
           if (result.length === 0) return null
           const {id} = result[0]
           const [_, timestamp] = id.split('!') // hack to get the correct timestamp; create is the same for all threads for some reason
-          return {[userid]: Number(timestamp)}
+          return {userid, created: Number(timestamp)}
         })
       )
 
