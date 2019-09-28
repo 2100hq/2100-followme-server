@@ -10,7 +10,7 @@ module.exports = (config,libs,emit)=>{
       userid,
       messageid: message.id,
       tokenid: message.tokenid,
-      parentid: message.parentid,
+      parentid: message.parentid || null,
       type
     })
   }
