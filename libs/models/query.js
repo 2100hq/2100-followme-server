@@ -196,7 +196,7 @@ module.exports = async (config, libs) => {
         })
       )
 
-      message.recipientTimestamps = recipientTimestamps.map(x => x)
+      message.recipientTimestamps = recipientTimestamps.filter(x => x)
     }
 
     return outputFn(message)
