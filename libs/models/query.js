@@ -70,9 +70,11 @@ module.exports = async (config, libs) => {
   }
 
   async function userInbox(userid,start,end){
+    console.log('got here1', userid)
     const list = await threads.byThread(userid)
 
     return Promise.map(list,async thread=>{
+      console.log('got here2', userid)
       const message = await messages.get(thread.messageid)
       return showMessage(message)
     })
@@ -93,6 +95,7 @@ module.exports = async (config, libs) => {
   }
 
   async function userNotifications(userid,read=false){
+    console.log('got here3', userid)
     return notifications.userRead(userid,read)
   }
 
