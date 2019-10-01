@@ -72,16 +72,16 @@ module.exports = async (config, libs) => {
   async function userInbox(userid,start,end){
     const list = await threads.byThread(userid)
 
-    return Promise.all(list.map(thread=>{
-      try {
-        return messages.get(thread.messageid)
-      } catch(e){
-        console.log('User inbox error', userid, thread)
-        console.log(e)
-        return null // squash errors
-      }
-    }))
-    .filter(m => m) // filter out error messages
+    return Promise.all(
+      list.map(async thread=>{
+        try {
+          return await messages.get(thread.messageid)
+        } catch(e){
+          return null
+        }
+      })
+    )
+    .filter(m => m)
     .map(showMessage)
   }
 
