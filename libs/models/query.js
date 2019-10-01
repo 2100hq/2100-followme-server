@@ -72,10 +72,17 @@ module.exports = async (config, libs) => {
   async function userInbox(userid,start,end){
     const list = await threads.byThread(userid)
 
-    return Promise.map(list,async thread=>{
-      const message = await messages.get(thread.messageid)
-      return showMessage(message)
-    })
+    return Promise.all(
+      list.map(async thread=>{
+        try {
+          return await messages.get(thread.messageid)
+        } catch(e){
+          return null
+        }
+      })
+    )
+    .filter(m => m)
+    .map(showMessage)
   }
 
   async function userTokenFeed(userid,tokenid,start,end){
@@ -141,7 +148,7 @@ module.exports = async (config, libs) => {
       // If this is not a reply
       if (!isReply){
         // in the background, publish this message to user's inbox so they dont have to decode again
-        threads.getByThreadIdMessageId(userid, message.id).then( async result => {
+        await threads.getByThreadIdMessageId(userid, message.id).then( async result => {
           if (result.length > 0) return
           await threads.create({created: message.created, threadid: userid,messageid:message.id})
         })
@@ -153,9 +160,10 @@ module.exports = async (config, libs) => {
       if (!message.recipients.includes(userid)){
         message.recipientcount = (message.recipientcount || 0)+1
         message.recipients.push(userid)
-        messages.set({...message}) // updates in the background; clone the object before saving, mutations below
+        await messages.set({...message}) // updates in the background; clone the object before saving, mutations below
       }
     }
+
     message = {...message} // clone the object, mutations below
 
     if (isReply){
@@ -185,6 +193,17 @@ module.exports = async (config, libs) => {
       )
 
       message.children = children.filter(x=>x)
+
+      const recipientTimestamps = await Promise.all((message.recipients||[]).map(async userid => {
+          const result = await threads.getByThreadIdMessageId(userid, message.id)
+          if (result.length === 0) return null
+          const {id} = result[0]
+          const [_, timestamp] = id.split('!') // hack to get the correct timestamp; create is the same for all threads for some reason
+          return {userid, created: Number(timestamp)}
+        })
+      )
+
+      message.recipientTimestamps = recipientTimestamps.filter(x => x)
     }
 
     return outputFn(message)

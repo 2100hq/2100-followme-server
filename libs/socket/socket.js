@@ -49,7 +49,7 @@ module.exports = async (config, libs,emit=x=>x) => {
       actions.auth(socket,action,args).then(result=>{
         cb(null, result)
       }).catch(err=>{
-        // console.log('auth error',err)
+        console.log('auth error',err)
         if (cb) cb(err.message)
       })
     })
@@ -59,6 +59,7 @@ module.exports = async (config, libs,emit=x=>x) => {
       users.getOrCreate(socket.userid).then(async user=>{
         cb(null, await actions.private(user,action,args))
       }).catch(err=>{
+        console.log('private error',err)
         if (cb) cb(err.message)
       })
     })
@@ -108,7 +109,7 @@ module.exports = async (config, libs,emit=x=>x) => {
       // console.log('public',batch)
       io.emit('public',batch)
     })
-    
+
 
   return {
     leave(sessionid,channel){
