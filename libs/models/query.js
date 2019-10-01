@@ -73,18 +73,17 @@ module.exports = async (config, libs) => {
     console.log('got here1', userid)
     const list = await threads.byThread(userid)
 
-    return Promise.all(list.map(async thread=>{
-      console.log('got here2', userid)
-      try {
-        return await messages.get(thread.messageid)
-      } catch(e){
-        console.log('error getting user inbox message', userid, thread)
-        console.log(e)
-        return null
-      }
-    }))
-      .filter(m => m)
-      .map(showMessage)
+    return Promise.all(
+      list.map(async thread=>{
+        try {
+          return await messages.get(thread.messageid)
+        } catch(e){
+          return null
+        }
+      })
+    )
+    .filter(m => m)
+    .map(showMessage)
   }
 
   async function userTokenFeed(userid,tokenid,start,end){
