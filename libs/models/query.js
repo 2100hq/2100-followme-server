@@ -76,9 +76,11 @@ module.exports = async (config, libs) => {
     return Promise.all(list.map(async thread=>{
       console.log('got here2', userid)
       try {
-        const message = await messages.get(thread.messageid)
+        return await messages.get(thread.messageid)
+        return message
       } catch(e){
-        console.log('erorr getting user inbox message', userid, thread)
+        console.log('error getting user inbox message', userid, thread)
+        console.log(e)
         return null
       }
     }))
