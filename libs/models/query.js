@@ -77,7 +77,6 @@ module.exports = async (config, libs) => {
       console.log('got here2', userid)
       try {
         return await messages.get(thread.messageid)
-        return message
       } catch(e){
         console.log('error getting user inbox message', userid, thread)
         console.log(e)
