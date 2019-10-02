@@ -2,6 +2,7 @@ const Users = require('./users')
 const Threads = require('./threads')
 const LazyCache = require('./lazy-cache')
 const Messages = require('./messages')
+const Subscriptions = require('./subscriptions')
 const Notifications = require('./notifications')
 module.exports = async (config,{con},emit=x=>x) => {
   return {
@@ -13,5 +14,8 @@ module.exports = async (config,{con},emit=x=>x) => {
     messages:Messages.Model(config,
       LazyCache(config,await Messages.Rethink({table:'messages'},con)),
       (...args)=>emit('messages',...args)),
+    subscriptions:Subscriptions.Model(config,
+      LazyCache(config,await Subscriptions.Rethink({table:'subscriptions'},con)),
+      (...args)=>emit('subscriptions',...args)),
   }
 }

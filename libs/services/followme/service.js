@@ -55,8 +55,19 @@ module.exports = async (config)=>{
   })
 
   const engines = {
-    decoder:Engines('decoder')(config,libs)
+    decoder:Engines('decoder')(config,libs),
+    webpush:Engines('web-push-notifications')(config,libs)
   }
+
+  events.on('models',([type,table,data])=>{
+    if(type!=='notifications') return
+    engines.webpush.tick(data).catch(err=>{
+      console.log('webpush err',err)
+    })
+  })
+
+  setInterval(x=>{
+  },5000)
 
   //calculate notifications
   loop(async x=>{
@@ -71,9 +82,11 @@ module.exports = async (config)=>{
   libs.express = await Express(config.express,libs)
   libs.socket = await Socket(config.socket,libs)
 
+
   events.on('socket',([channel,path,data,userid])=>{
     // console.log({channel,path,data,userid})
     libs.socket[channel](path,data,userid)
   })
+
 
 }

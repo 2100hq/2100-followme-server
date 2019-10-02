@@ -10,7 +10,28 @@ const {unfurl} = require('unfurl.js')
 let {url:unminifyUrl}  = require('unfurl-url');
 const {promisify} = require('util')
 const nodeURL = require('url');
+const crypto = require('crypto')
 unminifyUrl=promisify(unminifyUrl)
+
+exports.urlBase64ToUint8Array = (base64String) => {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding)
+    .replace(/-/g, '+')
+    .replace(/_/g, '/');
+
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+
+
+exports.md5 = str =>{
+  return crypto.createHash('md5').update(str).digest('hex')
+}
 
 exports.loop = async (fn, delay = 1000, max, count = 0, result) => {
   assert(lodash.isFunction(fn), 'loop requires a function')

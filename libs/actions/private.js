@@ -6,7 +6,7 @@ const Promise = require('bluebird')
 const highland = require('highland')
 
 
-module.exports = (config,{x2100,users,messages,threads,query})=>{
+module.exports = (config,{x2100,users,messages,threads,query,subscriptions})=>{
   assert(x2100,'requires 2100 client')
   assert(messages,'requires messages')
   assert(threads,'requires threads')
@@ -170,6 +170,20 @@ module.exports = (config,{x2100,users,messages,threads,query})=>{
       },
       async setNotificationRead(notificationid){
         return libs.notifications.read(notificationid)
+      },
+      async subscribe(props={}){
+        console.log('subscribe',props)
+        return subscriptions.create({
+          userid:user.id,
+          ...props,
+        })
+      },
+      async unsubscribe(){
+        const subs = await subscriptions.getByUser(user.id)
+        return Promise.all(subs.map(subscriptions.remove))
+      },
+      async mySubscriptions(){
+        return await subscriptions.getByUser(user.id)
       },
     }
     return actions

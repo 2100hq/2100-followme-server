@@ -21,6 +21,9 @@ module.exports = (config, table, emit=x=>x) =>{
     return result
   }
 
+  function deleteBy(prop,value){
+  }
+
   return {
     ...table,
     async set(id,data){
