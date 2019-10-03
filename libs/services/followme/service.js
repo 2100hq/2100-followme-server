@@ -60,13 +60,15 @@ module.exports = async (config)=>{
   }
 
   //dont check messages before server restart
-  const ignoreBefore = moment().subtract(1,'day').valueOf()
+  // const ignoreBefore = moment().subtract(1,'day').valueOf()
+  const ignoreBefore = parseInt(config.ignoreBefore || 0)
   //calculate notifications
   loop(async x=>{
     return libs.messages
       .readStream()
       .filter(x=>{
-        return x.created > ignoreBefore
+        if(ignoreBefore) return x.created > ignoreBefore
+        return true
       })
       .map(engines.decoder.tick)
       .flatMap(highland)
