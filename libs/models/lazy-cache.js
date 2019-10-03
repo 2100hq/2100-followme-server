@@ -1,11 +1,18 @@
+const highland = require('highland')
 module.exports = (config, table, emit=x=>x) =>{
+  
   const cache = new Map()
+  
+
   return {
     ...table,
     async set(id,data){
       await table.set(id,data)
       return cache.set(id,data)
     },
+    // readStream(){
+    //   return highland(cache.values())
+    // },
     async get(id){
       if(cache.has(id)){
         return cache.get(id)

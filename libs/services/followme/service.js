@@ -10,6 +10,7 @@ const highland = require('highland')
 const Engines = require('../../engines')
 const Socket = require('../../socket')
 const lodash = require('lodash')
+const moment = require('moment')
 
 module.exports = async (config)=>{
   config.publicFeedId = config.publicFeedId || '0x0'
@@ -58,10 +59,16 @@ module.exports = async (config)=>{
     decoder:Engines('decoder')(config,libs)
   }
 
+  //dont check messages before server restart
+  const ignoreBefore = moment().subtract(1,'day').valueOf()
   //calculate notifications
   loop(async x=>{
+    console.log('checkign all messages')
     return libs.messages
       .readStream()
+      .filter(x=>{
+        return x.created > ignoreBefore
+      })
       .map(engines.decoder.tick)
       .flatMap(highland)
       .last()

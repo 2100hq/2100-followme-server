@@ -49,7 +49,7 @@ module.exports = async (config, libs,emit=x=>x) => {
       actions.auth(socket,action,args).then(result=>{
         cb(null, result)
       }).catch(err=>{
-        console.log('auth error',err)
+        // console.log('auth error',err)
         if (cb) cb(err.message)
       })
     })

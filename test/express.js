@@ -65,7 +65,7 @@ test('express',t=>{
   })
   t.test('myTokens',async t=>{
     const result = await actions.private.call('myTokens')
-    // console.log(result)
+    console.log(result)
     t.ok(result.length)
     mytoken = result[0]
     t.end()
