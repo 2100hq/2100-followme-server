@@ -63,7 +63,6 @@ module.exports = async (config)=>{
   const ignoreBefore = moment().subtract(1,'day').valueOf()
   //calculate notifications
   loop(async x=>{
-    console.log('checkign all messages')
     return libs.messages
       .readStream()
       .filter(x=>{
