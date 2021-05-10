@@ -23,7 +23,7 @@
     "fastest-validator": "^0.6.17",
     "get-urls": "^9.1.0",
     "highland": "^2.13.5",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "moment": "^2.24.0",
     "pad": "^3.2.0",
     "rethink-table": "^0.0.5",
