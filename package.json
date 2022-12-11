@@ -18,7 +18,7 @@
     "cors": "^2.8.5",
     "dotenv": "^8.0.0",
     "ethers": "^4.0.33",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "express-bearer-token": "^2.4.0",
     "fastest-validator": "^0.6.17",
     "get-urls": "^9.1.0",
